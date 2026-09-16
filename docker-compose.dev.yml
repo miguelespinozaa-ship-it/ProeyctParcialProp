@@ -1,0 +1,165 @@
+# Entorno de desarrollo local: los 5 MS + las 3 BD en una sola red docker.
+# Uso: cp .env.example .env && docker compose -f docker-compose.dev.yml up -d --build
+version: "3.9"
+
+networks:
+  backend-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  pg_orders_data:
+  mongo_data:
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    networks: [backend-net]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_orders_data:/var/lib/postgresql/data
+      - ./db/postgres/init:/docker-entrypoint-initdb.d
+    networks: [backend-net]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./db/mongo/init:/docker-entrypoint-initdb.d
+    networks: [backend-net]
+
+  ms1:
+    build: ./ms1-usuarios-auth
+    container_name: ms1
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [backend-net]
+
+  ms2:
+    build: ./ms2-catalogo-restaurantes
+    container_name: ms2
+    restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://mongo:27017/ms2_catalogo
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mongo
+    networks: [backend-net]
+
+  ms3:
+    build: ./ms3-pedidos
+    container_name: ms3
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: ${POSTGRES_USER}
+      PG_PASSWORD: ${POSTGRES_PASSWORD}
+      PG_DATABASE: ${POSTGRES_DB}
+      MS1_BASE_URL: http://ms1:8081
+      MS2_BASE_URL: http://ms2:8082
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ms1:
+        condition: service_started
+      ms2:
+        condition: service_started
+    networks: [backend-net]
+
+  ms4:
+    build: ./ms4-agregador-rastreo
+    container_name: ms4
+    restart: unless-stopped
+    environment:
+      MS1_BASE_URL: http://ms1:8081
+      MS2_BASE_URL: http://ms2:8082
+      MS3_BASE_URL: http://ms3:8083
+    ports:
+      - "8084:8084"
+    depends_on:
+      - ms1
+      - ms2
+      - ms3
+    networks: [backend-net]
+
+  ms5:
+    build: ./ms5-analitico
+    container_name: ms5
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      ATHENA_DATABASE: ${ATHENA_DATABASE}
+      ATHENA_OUTPUT_S3: ${ATHENA_OUTPUT_S3}
+    ports:
+      - "8085:8085"
+    networks: [backend-net]
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - ms1
+      - ms2
+      - ms3
+      - ms4
+      - ms5
+    networks: [backend-net]

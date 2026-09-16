@@ -1,0 +1,51 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "MS3 - Pedidos", "version": "1.0.0" },
+  "paths": {
+    "/api/v1/orders": {
+      "post": { "summary": "Crear pedido (customer)", "responses": { "201": { "description": "Creado" } } },
+      "get": {
+        "summary": "Listar pedidos (filtros customer_id, restaurant_id, delivery_id, status)",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/v1/orders/available": {
+      "get": { "summary": "Pedidos disponibles para jalar (delivery)", "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/v1/orders/{orderId}": {
+      "get": {
+        "summary": "Detalle de pedido",
+        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" }, "404": { "description": "No encontrado" } }
+      }
+    },
+    "/api/v1/orders/{orderId}/status": {
+      "put": {
+        "summary": "PEDIDO -> ENVIADO (admin dueño del restaurante)",
+        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" }, "403": { "description": "No autorizado" } }
+      }
+    },
+    "/api/v1/orders/{orderId}/claim": {
+      "put": {
+        "summary": "Delivery jala el pedido (ENVIADO, sin asignar)",
+        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" }, "409": { "description": "No disponible" } }
+      }
+    },
+    "/api/v1/orders/{orderId}/deliver": {
+      "put": {
+        "summary": "ENVIADO -> ENTREGADO (delivery asignado)",
+        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" }, "409": { "description": "No permitido" } }
+      }
+    },
+    "/api/v1/restaurants/{restaurantId}/customers": {
+      "get": {
+        "summary": "Clientes distintos del restaurante (nombres resueltos vía MS1)",
+        "parameters": [{ "name": "restaurantId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  }
+}

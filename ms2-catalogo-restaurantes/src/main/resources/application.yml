@@ -1,0 +1,20 @@
+server:
+  port: 8082
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: ms2-catalogo-restaurantes
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/ms2_catalogo}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

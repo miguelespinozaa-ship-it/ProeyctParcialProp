@@ -1,0 +1,82 @@
+# EC2 #1 — App Tier: solo backends (los 5 MS + NGINX). Sin contenedores de BD.
+# DB_HOST debe apuntar a la IP privada de EC2 #2 (ver .env real de esa instancia).
+version: "3.9"
+
+networks:
+  app-net:
+    driver: bridge
+
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - ms1
+      - ms2
+      - ms3
+      - ms4
+      - ms5
+    networks: [app-net]
+
+  ms1:
+    build: ./ms1-usuarios-auth
+    container_name: ms1
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    ports: ["8081:8081"]
+    networks: [app-net]
+
+  ms2:
+    build: ./ms2-catalogo-restaurantes
+    container_name: ms2
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_URI: mongodb://${DB_HOST}:27017/ms2_catalogo
+    ports: ["8082:8082"]
+    networks: [app-net]
+
+  ms3:
+    build: ./ms3-pedidos
+    container_name: ms3
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PG_HOST: ${DB_HOST}
+      PG_PORT: 5432
+      PG_USER: ${POSTGRES_USER}
+      PG_PASSWORD: ${POSTGRES_PASSWORD}
+      PG_DATABASE: ${POSTGRES_DB}
+      MS1_BASE_URL: http://ms1:8081
+      MS2_BASE_URL: http://ms2:8082
+    ports: ["8083:8083"]
+    networks: [app-net]
+
+  ms4:
+    build: ./ms4-agregador-rastreo
+    container_name: ms4
+    restart: unless-stopped
+    environment:
+      MS1_BASE_URL: http://ms1:8081
+      MS2_BASE_URL: http://ms2:8082
+      MS3_BASE_URL: http://ms3:8083
+    ports: ["8084:8084"]
+    networks: [app-net]
+
+  ms5:
+    build: ./ms5-analitico
+    container_name: ms5
+    restart: unless-stopped
+    env_file: .env
+    ports: ["8085:8085"]
+    networks: [app-net]

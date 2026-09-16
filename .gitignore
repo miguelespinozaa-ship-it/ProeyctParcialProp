@@ -1,0 +1,35 @@
+# Secretos / config local — solo se versiona .env.example
+.env
+data-science/.env
+*.env
+!*.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Java / Maven
+target/
+*.class
+
+# Editores / SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+
+# Docker
+*.pid
+
+# Material del curso (no redistribuir)
+*.pdf

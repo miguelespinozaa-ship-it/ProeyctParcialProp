@@ -13,25 +13,47 @@ Monorepo con 5 microservicios + frontend SPA + pipeline de datos, desplegado en 
 
 ```bash
 cp .env.example .env
-# editar .env con tus valores
-
 docker compose -f docker-compose.dev.yml up -d --build
 ```
 
+Con eso alcanza — el `.env.example` ya trae valores funcionales para desarrollo local (JWT compartido, credenciales de las 3 BD, `ATHENA_MOCK=true`). Probado clonando el repo desde cero en una carpeta limpia.
+
 Servicios disponibles:
 
-| Servicio | URL local | Docs |
-|---|---|---|
-| MS1 (Usuarios/Auth) | http://localhost:8081 | `/docs` |
-| MS2 (Catálogo) | http://localhost:8082 | `/swagger-ui.html` |
-| MS3 (Pedidos) | http://localhost:8083 | `/api-docs` (pendiente Fase 4) |
-| MS4 (Agregador) | http://localhost:8084 | `/docs` |
-| MS5 (Analítico) | http://localhost:8085 | `/docs` |
-| NGINX (gateway local) | http://localhost:80 | — |
+| Servicio | URL local | Vía NGINX | Docs |
+|---|---|---|---|
+| MS1 (Usuarios/Auth) | http://localhost:8081 | http://localhost/ms1 | `/docs` |
+| MS2 (Catálogo) | http://localhost:8082 | http://localhost/ms2 | `/swagger-ui.html` |
+| MS3 (Pedidos) | http://localhost:8083 | http://localhost/ms3 | `/api-docs` |
+| MS4 (Agregador) | http://localhost:8084 | http://localhost/ms4 | `/docs` |
+| MS5 (Analítico) | http://localhost:8085 | http://localhost/ms5 | `/docs` |
+
+### Un paso manual único: `restaurante_id` del admin demo
+
+El seed de MySQL crea 3 usuarios de prueba (`customer@demo.com`, `delivery@demo.com`, `admin@demo.com`, password `password123`), pero el `restaurante_id` del admin queda con un placeholder porque MongoDB genera un `_id` distinto en cada arranque. Para probar el flujo de admin (cambiar pedidos a `ENVIADO`, CRUD de menú):
+
+```bash
+# 1. sacar el _id real de un restaurante
+curl http://localhost:8082/api/v1/restaurants
+
+# 2. apuntar el admin demo a ese restaurante
+docker exec mysql mysql -ums1_user -pms1_password ms1_usuarios \
+  -e "UPDATE usuarios SET restaurante_id='<_id de arriba>' WHERE email='admin@demo.com';"
+```
+
+### Smoke test rápido (registro → pedido → tracking)
+
+```bash
+# registrar y loguear un customer
+curl -X POST http://localhost/ms1/api/v1/auth/register -H "Content-Type: application/json" \
+  -d '{"nombre":"Test","email":"test@demo.com","password":"pass123","telefono":"999000000","rol":"customer"}'
+
+# ver restaurantes, crear pedido, etc. — ver microservicios/*.md para el detalle de cada endpoint
+```
 
 ## Estado actual
 
-Scaffold inicial (Fase 0-1 del plan de desarrollo): estructura de carpetas, Dockerfiles, esquemas de BD (MySQL/PostgreSQL/MongoDB) y esqueletos de endpoints (routers/controllers con `TODO` marcados por fase). La lógica de negocio se implementa fase por fase — ver [plan-desarrollo.md](plan-desarrollo.md).
+Fases 0-8 del plan de desarrollo completas y probadas end-to-end (incluyendo carga masiva de 20k registros y el stack completo detrás de NGINX): los 5 microservicios tienen lógica de negocio real, no solo esqueletos. Fase 9 (pipeline de ingesta a S3/Glue/Athena) está preparada en [data-science/](data-science/) lista para correr contra una cuenta AWS real — ver su [README](data-science/README.md). Detalle completo de qué se probó en cada fase: [plan-desarrollo.md](plan-desarrollo.md).
 
 ## Estructura
 
@@ -50,4 +72,4 @@ infra/diagramas/             diagramas draw.io
 
 ## Próximos pasos
 
-Ver el checklist completo en [plan-desarrollo.md](plan-desarrollo.md). Siguiente fase: **Fase 2 — MS1 (Usuarios/Auth)**, implementar la lógica real de `auth.py`/`users.py`/`addresses.py` sobre los modelos ya definidos.
+Ver el checklist completo en [plan-desarrollo.md](plan-desarrollo.md). Siguiente fase: **Fase 10 — Infra AWS real (2 EC2)**, desplegar `docker-compose.app.yml`/`docker-compose.db.yml` en instancias reales.

@@ -48,10 +48,30 @@ def run_query(query: str, poll_interval: float = 1.0, timeout: float = 30.0) -> 
     if status != "SUCCEEDED":
         raise RuntimeError(f"Athena query terminó en estado {status}")
 
-    result = client.get_query_results(QueryExecutionId=exec_id)
-    columns = [c["Label"] for c in result["ResultSet"]["ResultSetMetadata"]["ColumnInfo"]]
-    rows = []
-    for row in result["ResultSet"]["Rows"][1:]:  # la primera fila son los encabezados
-        values = [f.get("VarCharValue") for f in row["Data"]]
-        rows.append(dict(zip(columns, values)))
+    # get_query_results pagina de a 1000 filas — hay que seguir NextToken hasta agotarlo,
+    # si no se devuelven solo las primeras ~1000 filas de la query (silencioso, sin error).
+    columns: Optional[list[str]] = None
+    rows: list[dict] = []
+    next_token = None
+    first_page = True
+    while True:
+        kwargs = {"QueryExecutionId": exec_id, "MaxResults": 1000}
+        if next_token:
+            kwargs["NextToken"] = next_token
+        result = client.get_query_results(**kwargs)
+
+        result_rows = result["ResultSet"]["Rows"]
+        if first_page:
+            columns = [c["Label"] for c in result["ResultSet"]["ResultSetMetadata"]["ColumnInfo"]]
+            result_rows = result_rows[1:]  # la primera fila de la primera página son los encabezados
+            first_page = False
+
+        for row in result_rows:
+            values = [f.get("VarCharValue") for f in row["Data"]]
+            rows.append(dict(zip(columns, values)))
+
+        next_token = result.get("NextToken")
+        if not next_token:
+            break
+
     return rows

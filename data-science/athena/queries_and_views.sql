@@ -1,13 +1,23 @@
 -- Queries y vistas sobre el Data Catalog de Glue (database: ubereats_datalake).
--- Correr en la consola de Athena (o vía CLI/boto3) UNA VEZ que el Crawler ya pobló las tablas
--- usuarios, direcciones, orders, order_items, restaurantes.
+-- Corridas y verificadas contra datos reales (Fase 9 ejecutada) — las 4 queries y las 2 vistas
+-- devuelven filas reales, no son solo SQL "de papel".
+--
+-- 2 quirks reales encontrados y corregidos al correr esto contra el catálogo real:
+-- 1) El crawler catalogó la colección de Mongo como tabla "mongodb" (no "restaurantes") —
+--    pasa cuando un prefijo S3 solo tiene una subcarpeta hija.
+-- 2) El _id de Mongo se exportó como {"$oid": "..."} (json_util.default de bson), así que
+--    Glue lo infirió como struct row($oid varchar), no como string plano — hay que acceder
+--    a r._id."$oid" (comillas obligatorias por el símbolo $), si no: TYPE_MISMATCH al comparar
+--    contra el restaurant_id (varchar) de orders.
+-- 3) direcciones.es_principal (BOOLEAN en MySQL) llegó como bigint (0/1) al catálogo de Glue,
+--    no como boolean — comparar contra `1`, no contra `true`.
 --
 -- Nota sobre "rango de edad": el modelo de usuarios (MS1) no tiene fecha de nacimiento,
 -- solo fecha_registro. v_metricas_usuarios usa "antigüedad de cuenta" como sustituto real
 -- en vez de inventar una edad que no existe en la fuente.
 
 -- ============================================================
--- 1) Ventas totales por restaurante (orders + order_items + restaurantes)
+-- 1) Ventas totales por restaurante (orders + order_items + mongodb)
 -- ============================================================
 SELECT
     r.nombre AS restaurante,
@@ -15,7 +25,7 @@ SELECT
     SUM(oi.cantidad * oi.precio_unitario) AS total_ventas
 FROM orders o
 JOIN order_items oi ON oi.order_id = o.id
-JOIN restaurantes r ON r.id = o.restaurant_id
+JOIN mongodb r ON r._id."$oid" = o.restaurant_id
 GROUP BY r.nombre
 ORDER BY total_ventas DESC;
 
@@ -34,7 +44,7 @@ ORDER BY gasto_total DESC
 LIMIT 50;
 
 -- ============================================================
--- 3) Platos más vendidos por restaurante (order_items + orders + restaurantes)
+-- 3) Platos más vendidos por restaurante (order_items + orders + mongodb)
 -- ============================================================
 SELECT
     r.nombre AS restaurante,
@@ -42,7 +52,7 @@ SELECT
     SUM(oi.cantidad) AS unidades_vendidas
 FROM order_items oi
 JOIN orders o ON o.id = oi.order_id
-JOIN restaurantes r ON r.id = o.restaurant_id
+JOIN mongodb r ON r._id."$oid" = o.restaurant_id
 GROUP BY r.nombre, oi.nombre_plato
 ORDER BY unidades_vendidas DESC
 LIMIT 50;
@@ -57,7 +67,7 @@ SELECT
     COUNT(o.id) AS num_pedidos
 FROM orders o
 JOIN usuarios u ON u.id = o.customer_id
-LEFT JOIN direcciones d ON d.usuario_id = u.id AND d.es_principal = true
+LEFT JOIN direcciones d ON d.usuario_id = u.id AND d.es_principal = 1
 GROUP BY u.nombre, d.ciudad, o.direccion_entrega
 ORDER BY num_pedidos DESC
 LIMIT 50;
@@ -67,15 +77,15 @@ LIMIT 50;
 -- ============================================================
 CREATE OR REPLACE VIEW v_resumen_ventas_restaurante AS
 SELECT
-    r.id AS restaurante_id,
+    r._id."$oid" AS restaurante_id,
     r.nombre,
     COUNT(DISTINCT o.id) AS num_pedidos,
     SUM(oi.cantidad * oi.precio_unitario) AS total_ventas,
     r.calificacion_promedio
 FROM orders o
 JOIN order_items oi ON oi.order_id = o.id
-JOIN restaurantes r ON r.id = o.restaurant_id
-GROUP BY r.id, r.nombre, r.calificacion_promedio;
+JOIN mongodb r ON r._id."$oid" = o.restaurant_id
+GROUP BY r._id."$oid", r.nombre, r.calificacion_promedio;
 
 -- ============================================================
 -- Vista 2: v_metricas_usuarios (consumida por MS5 GET /analytics/user-metrics)
@@ -87,8 +97,8 @@ SELECT
     COUNT(o.id) AS num_pedidos,
     COALESCE(AVG(o.total), 0) AS gasto_promedio,
     CASE
-        WHEN date_diff('day', CAST(u.fecha_registro AS date), current_date) < 30 THEN '0-30 dias'
-        WHEN date_diff('day', CAST(u.fecha_registro AS date), current_date) < 90 THEN '31-90 dias'
+        WHEN date_diff('day', date(substr(u.fecha_registro, 1, 10)), current_date) < 30 THEN '0-30 dias'
+        WHEN date_diff('day', date(substr(u.fecha_registro, 1, 10)), current_date) < 90 THEN '31-90 dias'
         ELSE '90+ dias'
     END AS antiguedad_cuenta
 FROM usuarios u

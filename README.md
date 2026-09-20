@@ -1,6 +1,6 @@
 # Proyecto Parcial Cloud — Plataforma de Delivery (Microservicios)
 
-Monorepo con 5 microservicios + frontend SPA + pipeline de datos, desplegado en AWS (2 EC2 para backend + 1 EC2 de ingesta).
+Monorepo con 5 microservicios + frontend SPA + pipeline de datos, desplegado en AWS (EC2 App Tier + EC2 DB Tier + EC2 de ingesta, API Gateway, Amplify, S3/Glue/Athena).
 
 ## Documentación
 
@@ -53,7 +53,23 @@ curl -X POST http://localhost/ms1/api/v1/auth/register -H "Content-Type: applica
 
 ## Estado actual
 
-Fases 0-8 del plan de desarrollo completas y probadas end-to-end (incluyendo carga masiva de 20k registros y el stack completo detrás de NGINX): los 5 microservicios tienen lógica de negocio real, no solo esqueletos. Fase 9 (pipeline de ingesta a S3/Glue/Athena) está preparada en [data-science/](data-science/) lista para correr contra una cuenta AWS real — ver su [README](data-science/README.md). Detalle completo de qué se probó en cada fase: [plan-desarrollo.md](plan-desarrollo.md).
+Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y desplegadas en AWS. Queda la Fase 12 (entregables: diagramas, informe y PPT). Detalle de pruebas por fase: [plan-desarrollo.md](plan-desarrollo.md).
+
+| Pieza | Estado |
+|---|---|
+| 5 microservicios (FastAPI, Spring Boot, Express) | Desplegados en la EC2 App Tier con NGINX (`docker-compose.app.yml`) |
+| Bases de datos (MySQL, PostgreSQL, MongoDB) | EC2 DB Tier (`docker-compose.db.yml`); solo aceptan tráfico del Security Group de la App Tier, sin puertos abiertos a internet |
+| Carga masiva | 20,003 `usuarios` (MS1) y 20,000 `orders` (MS3) |
+| API Gateway (HTTPS) | Expone `/ms1` ... `/ms5` hacia NGINX |
+| Frontend SPA (React + Vite) | AWS Amplify, consume el API Gateway por HTTPS |
+| Data lake | 3 contenedores de ingesta -> S3 -> Glue Crawler -> Athena (2 vistas). MS5 consulta Athena real (`ATHENA_MOCK=false`) |
+| Paginado | Opt-in en los listados grandes (`?page=&page_size=`), ver [00-mapa-conexiones.md](microservicios/00-mapa-conexiones.md) |
+| Swagger UI | Los 5 servicios, también a través de NGINX y API Gateway (`/ms1/docs`, `/ms2/swagger-ui.html`, `/ms3/api-docs`, `/ms4/docs`, `/ms5/docs`) |
+
+### Decisiones de arquitectura respecto al enunciado
+
+- **Una sola EC2 de App** (en vez de dos): NGINX enruta por path a cada microservicio, pero no balancea carga entre dos VMs.
+- **Postman:** [postman/delivery-cloud.postman_collection.json](postman/delivery-cloud.postman_collection.json) cubre los 5 microservicios (66 requests, 54 assertions). Contra local: `--env-var "base_url=http://localhost"`.
 
 ## Estructura
 
@@ -65,11 +81,15 @@ ms4-agregador-rastreo/      FastAPI, sin BD — tracking + dashboards por rol
 ms5-analitico/               FastAPI + boto3 — consultas a AWS Athena
 nginx/                       reverse proxy / path routing
 db/                          scripts de inicialización de esquema por BD
-data-science/                pipeline ETL (Integrante 3, Fase 9)
-frontend/                    SPA (Integrante 4, Fase 11)
-infra/diagramas/             diagramas draw.io
+data-science/                pipeline ETL a S3 + SQL de Athena (queries_and_views.sql)
+frontend/                    SPA React (Vite)
+postman/                     colección de Postman
+infra/diagramas/             diagramas draw.io (pendiente)
 ```
 
-## Próximos pasos
+## Próximos pasos (Fase 12)
 
-Ver el checklist completo en [plan-desarrollo.md](plan-desarrollo.md). Siguiente fase: **Fase 10 — Infra AWS real (2 EC2)**, desplegar `docker-compose.app.yml`/`docker-compose.db.yml` en instancias reales.
+- Diagrama de arquitectura en draw.io (`infra/diagramas/`).
+- Diagrama ER del catálogo de Glue.
+- Evidencia de Athena (4 consultas con JOIN + 2 vistas) para el informe.
+- Informe técnico (PDF) y presentación (PowerPoint).

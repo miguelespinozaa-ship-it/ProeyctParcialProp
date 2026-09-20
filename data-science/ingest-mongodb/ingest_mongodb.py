@@ -20,6 +20,16 @@ S3_PREFIX = os.getenv("S3_PREFIX", "raw/mongodb")
 AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 
 
+def replace_prefix(s3, prefix):
+    """Full refresh: borra el snapshot anterior de esta tabla antes de subir el nuevo.
+    Sin esto, dos corridas (dt=fecha distinta) quedan como dos particiones y Athena las suma."""
+    paginator = s3.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=S3_BUCKET, Prefix=prefix):
+        objs = [{"Key": o["Key"]} for o in page.get("Contents", [])]
+        if objs:
+            s3.delete_objects(Bucket=S3_BUCKET, Delete={"Objects": objs})
+
+
 def main():
     client = MongoClient(MONGO_URI)
     db = client[DB_NAME]
@@ -33,6 +43,7 @@ def main():
 
     body = "\n".join(lines).encode("utf-8")
     key = f"{S3_PREFIX}/{COLLECTION}/dt={run_date}/{COLLECTION}.jsonl"
+    replace_prefix(s3, f"{S3_PREFIX}/{COLLECTION}/")
     s3.put_object(Bucket=S3_BUCKET, Key=key, Body=body)
     print(f"  subido a s3://{S3_BUCKET}/{key}")
     print("Ingesta MongoDB completa.")

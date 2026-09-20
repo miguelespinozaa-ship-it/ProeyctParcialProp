@@ -7,16 +7,22 @@ import NavBar from "../../components/NavBar";
 import Pagination from "../../components/Pagination";
 
 const ORDERS_PAGE_SIZE = 5;
+const RESTAURANTS_PAGE_SIZE = 12;
 
 export default function CustomerHome() {
   const { auth } = useAuth();
   const [restaurants, setRestaurants] = useState(null);
   const [orders, setOrders] = useState(null);
   const [ordersPage, setOrdersPage] = useState(1);
+  const [restaurantsPage, setRestaurantsPage] = useState(1);
+  const [loadingRestaurants, setLoadingRestaurants] = useState(false);
 
   useEffect(() => {
-    listRestaurants().then(setRestaurants);
-  }, []);
+    setLoadingRestaurants(true);
+    listRestaurants({ page: restaurantsPage, page_size: RESTAURANTS_PAGE_SIZE })
+      .then(setRestaurants)
+      .finally(() => setLoadingRestaurants(false));
+  }, [restaurantsPage]);
 
   useEffect(() => {
     listOrders({ customer_id: auth.userId, page: ordersPage, page_size: ORDERS_PAGE_SIZE }).then(setOrders);
@@ -30,7 +36,7 @@ export default function CustomerHome() {
       <main className="container">
         <h1>Restaurantes</h1>
         <div className="grid">
-          {restaurants.map((r) => (
+          {restaurants.items.map((r) => (
             <Link key={r.id} to={`/customer/restaurants/${r.id}`} className="card">
               <h3>{r.nombre}</h3>
               <p>
@@ -40,6 +46,13 @@ export default function CustomerHome() {
             </Link>
           ))}
         </div>
+        <Pagination
+          page={restaurants.page}
+          totalPages={restaurants.total_pages}
+          total={restaurants.total}
+          onChange={setRestaurantsPage}
+          disabled={loadingRestaurants}
+        />
 
         <h2>Mis pedidos</h2>
         <ul className="order-list">

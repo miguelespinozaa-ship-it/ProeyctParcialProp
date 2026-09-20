@@ -112,5 +112,5 @@ Los endpoints de listado tienen **dos modos**, en la misma ruta:
 - `page` desde 1. `page_size` por defecto 20, **máximo 100** (si se pide más se limita y la respuesta informa el tamaño aplicado).
 - Página fuera de rango → `items` vacío (no es error). `page`/`page_size` inválidos → **400** en MS3 y **422** en los servicios FastAPI (MS1, MS4, MS5).
 - El modo completo se mantiene por compatibilidad (seeds, llamadas internas). Las pantallas usan el paginado.
-- Endpoints con paginado: MS1 `GET /users`; MS3 `GET /orders`, `GET /orders/available`, `GET /restaurants/{id}/customers`; MS4 los 3 dashboards; MS5 `GET /analytics/user-metrics` (aquí `data` sigue siendo un array y se agregan `page/page_size/total/total_pages`).
+- Endpoints con paginado: MS1 `GET /users`; MS2 `GET /restaurants` (también con `categoria`/`ciudad`; MongoDB tiene 20,000 restaurantes); MS3 `GET /orders`, `GET /orders/available`, `GET /restaurants/{id}/customers`; MS4 los 3 dashboards; MS5 `GET /analytics/user-metrics` (aquí `data` sigue siendo un array y se agregan `page/page_size/total/total_pages`).
 - Extras para no traer miles de filas: MS3 `GET /orders/summary` (conteo por estado). MS4 modo paginado del dashboard admin: `?status=PEDIDO|ENVIADO|ENTREGADO&page=&page_size=&customers_page=`; delivery: `?page=&page_size=&curso_page=`.

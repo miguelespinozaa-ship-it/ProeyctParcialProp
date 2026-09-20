@@ -1,8 +1,14 @@
 package com.proyecto.ms2.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,16 +29,44 @@ public class RestaurantController {
         this.restauranteRepository = restauranteRepository;
     }
 
+    private static final int DEFAULT_PAGE_SIZE = 20;
+    private static final int MAX_PAGE_SIZE = 100;
+
+    /**
+     * Sin page/page_size devuelve todo (array, como siempre); con ellos, {items, page, page_size, total, total_pages}.
+     * page_size por defecto 20 y máximo 100 (si piden más se limita). Header X-Total-Count en ambos modos.
+     */
     @GetMapping
-    public List<Restaurante> listar(@RequestParam(required = false) String categoria,
-                                     @RequestParam(required = false) String ciudad) {
-        if (categoria != null) {
-            return restauranteRepository.findByCategoria(categoria);
+    public ResponseEntity<Object> listar(@RequestParam(required = false) String categoria,
+                                          @RequestParam(required = false) String ciudad,
+                                          @RequestParam(required = false) Integer page,
+                                          @RequestParam(name = "page_size", required = false) Integer pageSize) {
+        if (page == null && pageSize == null) {
+            List<Restaurante> todos = categoria != null ? restauranteRepository.findByCategoria(categoria)
+                    : ciudad != null ? restauranteRepository.findByCiudad(ciudad)
+                    : restauranteRepository.findAll();
+            return ResponseEntity.ok().header("X-Total-Count", String.valueOf(todos.size())).body(todos);
         }
-        if (ciudad != null) {
-            return restauranteRepository.findByCiudad(ciudad);
+
+        int numero = page != null ? page : 1;
+        int tamano = pageSize != null ? pageSize : DEFAULT_PAGE_SIZE;
+        if (numero < 1 || tamano < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page y page_size deben ser enteros >= 1");
         }
-        return restauranteRepository.findAll();
+        tamano = Math.min(tamano, MAX_PAGE_SIZE);
+
+        PageRequest pedido = PageRequest.of(numero - 1, tamano, Sort.by("id"));
+        Page<Restaurante> resultado = categoria != null ? restauranteRepository.findByCategoria(categoria, pedido)
+                : ciudad != null ? restauranteRepository.findByCiudad(ciudad, pedido)
+                : restauranteRepository.findAll(pedido);
+
+        Map<String, Object> cuerpo = new LinkedHashMap<>();
+        cuerpo.put("items", resultado.getContent());
+        cuerpo.put("page", numero);
+        cuerpo.put("page_size", tamano);
+        cuerpo.put("total", resultado.getTotalElements());
+        cuerpo.put("total_pages", resultado.getTotalPages());
+        return ResponseEntity.ok().header("X-Total-Count", String.valueOf(resultado.getTotalElements())).body(cuerpo);
     }
 
     @GetMapping("/{restaurantId}")

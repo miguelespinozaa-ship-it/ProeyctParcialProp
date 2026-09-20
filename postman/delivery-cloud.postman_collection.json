@@ -434,12 +434,12 @@
       "name": "MS2 - Catalogo",
       "item": [
         {
-          "name": "List restaurants",
+          "name": "List restaurants (paginado)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/ms2/api/v1/restaurants",
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?page=1&page_size=10",
               "host": [
                 "{{base_url}}"
               ],
@@ -448,6 +448,16 @@
                 "api",
                 "v1",
                 "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10"
+                }
               ]
             }
           },
@@ -458,8 +468,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "const j = pm.response.json();",
-                  "pm.collectionVariables.set(\"restaurant_id\", j[0].id);",
-                  "pm.test(\"hay restaurantes\", () => pm.expect(j.length).to.be.above(0));"
+                  "pm.collectionVariables.set(\"restaurant_id\", j.items[0].id);",
+                  "pm.test(\"hay restaurantes\", () => pm.expect(j.items.length).to.be.above(0));"
                 ]
               }
             }
@@ -1227,6 +1237,217 @@
               ]
             }
           }
+        }
+      ]
+    },
+    {
+      "name": "MS2 - Catálogo (paginado)",
+      "item": [
+        {
+          "name": "restaurants paginado (page=1,page_size=5)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => { const j = pm.response.json(); pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\"); pm.expect(j.items).to.be.an(\"array\"); pm.expect(j.items.length).to.be.at.most(j.page_size); });",
+                  "pm.test(\"page_size=5 y total>=20000\", () => { const j = pm.response.json(); pm.expect(j.page_size).to.eql(5); pm.expect(j.total).to.be.at.least(20000); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "restaurants page_size=1000 -> se limita a 100",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?page=1&page_size=1000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "1000"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"page_size limitado a 100\", () => pm.expect(pm.response.json().page_size).to.eql(100));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "restaurants filtrado por categoria + paginado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?categoria=Sushi&page=1&page_size=3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "categoria",
+                  "value": "Sushi"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => { const j = pm.response.json(); pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\"); pm.expect(j.items).to.be.an(\"array\"); pm.expect(j.items.length).to.be.at.most(j.page_size); });",
+                  "pm.test(\"todos son Sushi\", () => pm.response.json().items.forEach(r => pm.expect(r.categoria).to.eql(\"Sushi\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "restaurants pagina fuera de rango -> items vacio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?page=999999&page_size=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "999999"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"items vacio\", () => pm.expect(pm.response.json().items.length).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "restaurants page=0 -> 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

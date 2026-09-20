@@ -59,7 +59,7 @@ Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y d
 |---|---|
 | 5 microservicios (FastAPI, Spring Boot, Express) | Desplegados en la EC2 App Tier con NGINX (`docker-compose.app.yml`) |
 | Bases de datos (MySQL, PostgreSQL, MongoDB) | EC2 DB Tier (`docker-compose.db.yml`); solo aceptan tráfico del Security Group de la App Tier, sin puertos abiertos a internet |
-| Carga masiva | 20,003 `usuarios` (MS1) y 20,000 `orders` (MS3) |
+| Carga masiva | 20,007 `usuarios` (MS1, `seed.py`), 20,009 `orders` (MS3, `seed.js`) y 20,000 `restaurantes` (MS2, `seed.js` en mongosh) |
 | API Gateway (HTTPS) | Expone `/ms1` ... `/ms5` hacia NGINX |
 | Frontend SPA (React + Vite) | AWS Amplify, consume el API Gateway por HTTPS |
 | MV de ingesta | EC2 dedicada `PP-Ingest-VM` (SG propio sin entradas, rol `LabInstanceProfile`). Ejecuta los 3 contenedores ETL por IP privada hacia la BD |

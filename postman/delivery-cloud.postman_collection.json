@@ -1,0 +1,1276 @@
+{
+  "info": {
+    "name": "Delivery Cloud - Microservicios",
+    "description": "Correr en orden: Health -> MS1 logins -> MS2 list restaurants -> MS3 crear/enviar/entregar pedido -> MS4 -> MS5. Los scripts guardan token/ids en variables automaticamente. Cambiar base_url al API Gateway (https://jt3z0elcud.execute-api.us-east-1.amazonaws.com) si se quiere probar por HTTPS.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health (los 5)",
+      "item": [
+        {
+          "name": "ms1 health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms1/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ms2 health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ms3 health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ms4 health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms4/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ms5 health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS1 - Usuarios/Auth",
+      "item": [
+        {
+          "name": "Register customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Test Postman\",\n  \"email\": \"postman{{$timestamp}}@demo.com\",\n  \"password\": \"pass123\",\n  \"telefono\": \"999000111\",\n  \"rol\": \"customer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_customer\", j.token);",
+                  "pm.collectionVariables.set(\"customer_id\", j.id);",
+                  "pm.test(\"201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register admin (debe dar 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"x\",\n  \"email\": \"x@demo.com\",\n  \"password\": \"x\",\n  \"telefono\": \"1\",\n  \"rol\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 rechazado\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login customer (demo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@demo.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_customer\", j.access_token);",
+                  "const p = JSON.parse(atob(j.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
+                  "pm.collectionVariables.set(\"customer_id\", p.sub);",
+                  "pm.test(\"login ok\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login admin (demo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_admin\", j.access_token);",
+                  "const p = JSON.parse(atob(j.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
+                  "pm.collectionVariables.set(\"admin_restaurant_id\", j.restaurante_id);",
+                  "pm.test(\"login ok\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login delivery (demo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"delivery@demo.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_delivery\", j.access_token);",
+                  "const p = JSON.parse(atob(j.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));",
+                  "pm.collectionVariables.set(\"delivery_id\", p.sub);",
+                  "pm.test(\"login ok\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get user (customer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users/{{customer_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users",
+                "{{customer_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List addresses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users/{{customer_id}}/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users",
+                "{{customer_id}}",
+                "addresses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users/{{customer_id}}/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users",
+                "{{customer_id}}",
+                "addresses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calle\": \"Av. Test 123\",\n  \"ciudad\": \"Lima\",\n  \"referencia\": \"cerca al parque\",\n  \"es_principal\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS2 - Catalogo",
+      "item": [
+        {
+          "name": "List restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"restaurant_id\", j[0].id);",
+                  "pm.test(\"hay restaurantes\", () => pm.expect(j.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List restaurants (filtro categoria)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants?categoria=Italiana",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants"
+              ],
+              "query": [
+                {
+                  "key": "categoria",
+                  "value": "Italiana"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get restaurant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List menu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}/menu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "menu"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get dish (usado por MS3)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}/menu/p1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "menu",
+                "p1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create dish (admin dueño)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{admin_restaurant_id}}/menu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{admin_restaurant_id}}",
+                "menu"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ceviche\",\n  \"descripcion\": \"Fresco\",\n  \"precio\": 28.5,\n  \"categoria\": \"Entradas\",\n  \"disponible\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"new_dish_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Toggle disponibilidad (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{admin_restaurant_id}}/menu/{{new_dish_id}}/disponibilidad",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{admin_restaurant_id}}",
+                "menu",
+                "{{new_dish_id}}",
+                "disponibilidad"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete dish (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{admin_restaurant_id}}/menu/{{new_dish_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{admin_restaurant_id}}",
+                "menu",
+                "{{new_dish_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create dish SIN token (debe dar 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}/menu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "menu"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"x\",\n  \"precio\": 1,\n  \"disponible\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "reviews"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "reviews"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario_id\": 1,\n  \"comentario\": \"Muy rico\",\n  \"puntuacion\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS3 - Pedidos",
+      "item": [
+        {
+          "name": "Create order (customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurant_id\": \"{{restaurant_id}}\",\n  \"direccion_entrega\": \"Av. Postman 1\",\n  \"items\": [\n    {\n      \"dish_id\": \"p1\",\n      \"cantidad\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"order_id\", pm.response.json().id);",
+                  "pm.test(\"201 y PEDIDO\", () => { pm.response.to.have.status(201); pm.expect(pm.response.json().status).to.eql(\"PEDIDO\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create order plato inexistente (debe dar 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurant_id\": \"{{restaurant_id}}\",\n  \"direccion_entrega\": \"x\",\n  \"items\": [\n    {\n      \"dish_id\": \"no-existe\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/{{order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "{{order_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List orders by customer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?customer_id={{customer_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "customer_id",
+                  "value": "{{customer_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin: PEDIDO -> ENVIADO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/{{order_id}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "{{order_id}}",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delivery: pedidos disponibles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_delivery}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/available",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "available"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delivery: claim",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_delivery}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/{{order_id}}/claim",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "{{order_id}}",
+                "claim"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delivery: deliver -> ENTREGADO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_delivery}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/{{order_id}}/deliver",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "{{order_id}}",
+                "deliver"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Clientes del restaurante",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/restaurants/{{restaurant_id}}/customers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "customers"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS4 - Agregador/Rastreo",
+      "item": [
+        {
+          "name": "Tracking (admin ve cliente+repartidor)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/tracking/order/{{order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "tracking",
+                "order",
+                "{{order_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard customer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/customer/{{customer_id}}/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "customer",
+                "{{customer_id}}",
+                "summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard delivery",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_delivery}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/delivery/{{delivery_id}}/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "delivery",
+                "{{delivery_id}}",
+                "summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/admin/{{admin_restaurant_id}}/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "admin",
+                "{{admin_restaurant_id}}",
+                "summary"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "MS5 - Analitico",
+      "item": [
+        {
+          "name": "Top restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/api/v1/analytics/top-restaurants",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "api",
+                "v1",
+                "analytics",
+                "top-restaurants"
+              ]
+            }
+          }
+        },
+        {
+          "name": "User metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/api/v1/analytics/user-metrics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "api",
+                "v1",
+                "analytics",
+                "user-metrics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sales summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/api/v1/analytics/sales-summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "api",
+                "v1",
+                "analytics",
+                "sales-summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Views",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/api/v1/analytics/views",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "api",
+                "v1",
+                "analytics",
+                "views"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://34.207.211.137"
+    },
+    {
+      "key": "token_customer",
+      "value": ""
+    },
+    {
+      "key": "token_admin",
+      "value": ""
+    },
+    {
+      "key": "token_delivery",
+      "value": ""
+    },
+    {
+      "key": "customer_id",
+      "value": ""
+    },
+    {
+      "key": "delivery_id",
+      "value": ""
+    },
+    {
+      "key": "restaurant_id",
+      "value": ""
+    },
+    {
+      "key": "admin_restaurant_id",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": ""
+    },
+    {
+      "key": "new_dish_id",
+      "value": ""
+    }
+  ]
+}

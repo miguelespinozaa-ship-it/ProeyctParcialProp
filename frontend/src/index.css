@@ -242,8 +242,9 @@ select {
   gap: 8px;
 }
 
-.order-list li,
+.order-list > li,
 .dish-list li {
+  flex-wrap: wrap;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -345,4 +346,13 @@ th {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+}
+
+.order-items {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0 0 0 20px;
+  list-style: disc;
+  font-size: 0.9em;
+  color: #555;
 }

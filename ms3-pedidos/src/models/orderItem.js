@@ -18,4 +18,10 @@ async function findByOrderId(orderId) {
   return rows;
 }
 
-module.exports = { createMany, findByOrderId };
+async function findByOrderIds(orderIds) {
+  if (orderIds.length === 0) return [];
+  const { rows } = await pool.query("SELECT * FROM order_items WHERE order_id = ANY($1::int[]) ORDER BY id", [orderIds]);
+  return rows;
+}
+
+module.exports = { createMany, findByOrderId, findByOrderIds };

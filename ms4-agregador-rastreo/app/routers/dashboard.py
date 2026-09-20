@@ -169,7 +169,7 @@ async def admin_summary(
     estado = status or "PEDIDO"
     resultados = await asyncio.gather(
         ms3_client.orders_summary(restaurant_id=restaurant_id),
-        ms3_client.list_orders(restaurant_id=restaurant_id, status=estado, page=page, page_size=page_size),
+        ms3_client.list_orders(restaurant_id=restaurant_id, status=estado, page=page, page_size=page_size, include_items="true"),
         ms3_client.get_restaurant_customers(restaurant_id, page=customers_page, page_size=page_size),
         return_exceptions=True,
     )

@@ -92,12 +92,24 @@ router.get("/orders/:orderId", async (req, res) => {
   res.json({ ...order, items });
 });
 
-// GET /api/v1/orders — filtros ?customer_id= / ?restaurant_id=&status= / ?delivery_id=
+// Con ?include_items=true cada pedido trae su lista de platos (una sola consulta extra para toda la página).
+async function attachItems(orders) {
+  const items = await orderItemModel.findByOrderIds(orders.map((o) => o.id));
+  const byOrder = new Map();
+  for (const it of items) {
+    if (!byOrder.has(it.order_id)) byOrder.set(it.order_id, []);
+    byOrder.get(it.order_id).push(it);
+  }
+  return orders.map((o) => ({ ...o, items: byOrder.get(o.id) || [] }));
+}
+
+// GET /api/v1/orders — filtros ?customer_id= / ?restaurant_id=&status= / ?delivery_id= / ?include_items=true
 // Sin page/page_size devuelve todo (array, como siempre); con ellos, respuesta paginada.
 // Nota: sin auth obligatoria, igual que GET /users en MS1 — lo consume MS4 internamente.
 router.get("/orders", async (req, res) => {
   const { customer_id: customerId, restaurant_id: restaurantId, delivery_id: deliveryId, status } = req.query;
   const filters = { customerId, restaurantId, deliveryId, status };
+  const withItems = req.query.include_items === "true";
 
   const paging = parsePaging(req.query);
   if (paging && paging.error) return res.status(400).json({ error: paging.error });
@@ -105,14 +117,14 @@ router.get("/orders", async (req, res) => {
   if (!paging) {
     const orders = await orderModel.findByFilters(filters);
     res.set("X-Total-Count", String(orders.length));
-    return res.json(orders);
+    return res.json(withItems ? await attachItems(orders) : orders);
   }
   const [items, total] = await Promise.all([
     orderModel.findByFilters({ ...filters, limit: paging.limit, offset: paging.offset }),
     orderModel.countByFilters(filters),
   ]);
   res.set("X-Total-Count", String(total));
-  res.json(envelope(items, total, paging));
+  res.json(envelope(withItems ? await attachItems(items) : items, total, paging));
 });
 
 // PUT /api/v1/orders/:orderId/status — PEDIDO -> ENVIADO, solo admin dueño del restaurante

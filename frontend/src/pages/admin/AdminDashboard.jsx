@@ -8,6 +8,8 @@ import Pagination from "../../components/Pagination";
 const ESTADOS = ["PEDIDO", "ENVIADO", "ENTREGADO"];
 const PAGE_SIZE = 10;
 
+const totalPlatos = (pedido) => (pedido.items || []).reduce((acc, it) => acc + it.cantidad, 0);
+
 export default function AdminDashboard() {
   const { auth } = useAuth();
   const [summary, setSummary] = useState(null);
@@ -76,8 +78,15 @@ export default function AdminDashboard() {
         <ul className="order-list">
           {pedidos.items.map((o) => (
             <li key={o.id}>
-              #{o.id} — S/ {o.total} — {o.direccion_entrega}
+              #{o.id} — {totalPlatos(o)} {totalPlatos(o) === 1 ? "plato" : "platos"} — S/ {o.total} — {o.direccion_entrega}
               {summary.estado === "PEDIDO" && <button onClick={() => handleSend(o.id)}>Enviar</button>}
+              <ul className="order-items">
+                {(o.items || []).map((it) => (
+                  <li key={it.id}>
+                    {it.cantidad} × {it.nombre_plato} (S/ {it.precio_unitario} c/u)
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
           {pedidos.items.length === 0 && <p>Sin pedidos en este estado.</p>}

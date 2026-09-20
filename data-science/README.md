@@ -2,7 +2,7 @@
 
 Pipeline: 3 contenedores de ingesta (Pull 100%) → S3 (data lake) → Glue Crawler (Data Catalog) → Athena (queries + vistas) → consumido por MS5.
 
-Todo el código de acá ya está listo. Esta guía es para correrlo vos mismo contra tu cuenta AWS real — nada de esto se ejecutó todavía.
+Todo el código de acá está probado y ya se ejecutó de verdad en AWS: la ingesta corre desde la MV dedicada `PP-Ingest-VM`, que usa el rol de instancia (sin claves en el `.env`). Esta guía sirve para repetir el proceso.
 
 ## 0. Prerrequisitos
 
@@ -37,7 +37,7 @@ En la MV de Ingesta (o desde cualquier máquina con red hacia la MV de BD y cred
 ```bash
 cd data-science
 cp .env.example .env
-# completar DB_HOST (IP de la MV de BD), S3_BUCKET, AWS_ACCESS_KEY_ID/SECRET_ACCESS_KEY
+# completar DB_HOST (IP privada de la MV de BD) y S3_BUCKET. En EC2 no hacen falta claves AWS: se usa el rol de la instancia
 docker compose -f docker-compose.ingest.yml up --build
 ```
 

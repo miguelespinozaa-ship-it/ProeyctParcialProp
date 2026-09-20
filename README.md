@@ -62,13 +62,15 @@ Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y d
 | Carga masiva | 20,003 `usuarios` (MS1) y 20,000 `orders` (MS3) |
 | API Gateway (HTTPS) | Expone `/ms1` ... `/ms5` hacia NGINX |
 | Frontend SPA (React + Vite) | AWS Amplify, consume el API Gateway por HTTPS |
-| Data lake | 3 contenedores de ingesta -> S3 -> Glue Crawler -> Athena (2 vistas). MS5 consulta Athena real (`ATHENA_MOCK=false`) |
+| MV de ingesta | EC2 dedicada `PP-Ingest-VM` (SG propio sin entradas, rol `LabInstanceProfile`). Ejecuta los 3 contenedores ETL por IP privada hacia la BD |
+| Data lake | 3 contenedores de ingesta -> S3 (snapshot completo, sin duplicados) -> Glue Crawler -> Athena (2 vistas). MS5 consulta Athena real (`ATHENA_MOCK=false`) |
 | Paginado | Opt-in en los listados grandes (`?page=&page_size=`), ver [00-mapa-conexiones.md](microservicios/00-mapa-conexiones.md) |
 | Swagger UI | Los 5 servicios, también a través de NGINX y API Gateway (`/ms1/docs`, `/ms2/swagger-ui.html`, `/ms3/api-docs`, `/ms4/docs`, `/ms5/docs`) |
 
 ### Decisiones de arquitectura respecto al enunciado
 
 - **Una sola EC2 de App** (en vez de dos): NGINX enruta por path a cada microservicio, pero no balancea carga entre dos VMs.
+- **Amplify por despliegue manual** (zip): no está conectado a GitHub para CI/CD.
 - **Postman:** [postman/delivery-cloud.postman_collection.json](postman/delivery-cloud.postman_collection.json) cubre los 5 microservicios (66 requests, 54 assertions). Contra local: `--env-var "base_url=http://localhost"`.
 
 ## Estructura

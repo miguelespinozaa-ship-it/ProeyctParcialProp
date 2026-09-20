@@ -1,12 +1,13 @@
-from typing import Optional
+import math
+from typing import Optional, Union
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.deps import get_current_user, require_admin
 from app.models import Rol, Usuario
-from app.schemas import UsuarioOut, UsuarioUpdate
+from app.schemas import PaginatedUsuarios, UsuarioOut, UsuarioUpdate
 
 router = APIRouter(prefix="/api/v1", tags=["users"])
 
@@ -47,10 +48,17 @@ def update_user(
     return usuario
 
 
-@router.get("/users", response_model=list[UsuarioOut])
+MAX_PAGE_SIZE = 100
+DEFAULT_PAGE_SIZE = 20
+
+
+@router.get("/users", response_model=Union[PaginatedUsuarios, list[UsuarioOut]])
 def list_users(
+    response: Response,
     rol: Optional[str] = None,
     ids: Optional[str] = None,
+    page: Optional[int] = Query(None, ge=1, description="Activa el paginado (desde 1). Sin page/page_size devuelve todo."),
+    page_size: Optional[int] = Query(None, ge=1, description=f"Tamaño de página (por defecto {DEFAULT_PAGE_SIZE}, máximo {MAX_PAGE_SIZE})"),
     db: Session = Depends(get_db),
 ):
     # Nota: endpoint también consumido internamente por MS3/MS4 (red docker privada),
@@ -61,7 +69,25 @@ def list_users(
     if ids is not None:
         id_list = [int(x) for x in ids.split(",") if x.strip()]
         query = query.filter(Usuario.id.in_(id_list))
-    return query.all()
+    query = query.order_by(Usuario.id)
+
+    if page is None and page_size is None:
+        users = query.all()
+        response.headers["X-Total-Count"] = str(len(users))
+        return users
+
+    page = page or 1
+    size = min(page_size or DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE)
+    total = query.count()
+    rows = query.offset((page - 1) * size).limit(size).all()
+    response.headers["X-Total-Count"] = str(total)
+    return PaginatedUsuarios(
+        items=[UsuarioOut.model_validate(r) for r in rows],
+        page=page,
+        page_size=size,
+        total=total,
+        total_pages=math.ceil(total / size),
+    )
 
 
 @router.delete("/users/{user_id}", status_code=204)

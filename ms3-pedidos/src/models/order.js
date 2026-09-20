@@ -14,7 +14,7 @@ async function findById(orderId) {
   return rows[0] || null;
 }
 
-async function findByFilters({ customerId, restaurantId, deliveryId, status }) {
+function buildWhere({ customerId, restaurantId, deliveryId, status }) {
   const clauses = [];
   const values = [];
   if (customerId) {
@@ -33,16 +33,56 @@ async function findByFilters({ customerId, restaurantId, deliveryId, status }) {
     values.push(status);
     clauses.push(`status = $${values.length}`);
   }
-  const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
-  const { rows } = await pool.query(`SELECT * FROM orders ${where} ORDER BY created_at DESC`, values);
+  return { where: clauses.length ? `WHERE ${clauses.join(" AND ")}` : "", values };
+}
+
+// Sin limit/offset devuelve todo (comportamiento original). Orden estable para poder paginar.
+async function findByFilters({ limit, offset, ...filters }) {
+  const { where, values } = buildWhere(filters);
+  let sql = `SELECT * FROM orders ${where} ORDER BY created_at DESC, id DESC`;
+  if (limit !== undefined) {
+    values.push(limit, offset);
+    sql += ` LIMIT $${values.length - 1} OFFSET $${values.length}`;
+  }
+  const { rows } = await pool.query(sql, values);
   return rows;
 }
 
-async function findAvailable() {
+async function countByFilters(filters) {
+  const { where, values } = buildWhere(filters);
+  const { rows } = await pool.query(`SELECT COUNT(*)::int AS total FROM orders ${where}`, values);
+  return rows[0].total;
+}
+
+// Cantidad de pedidos por estado (para dashboards, sin traer las filas).
+async function countByStatus(filters) {
+  const { where, values } = buildWhere({ ...filters, status: undefined });
   const { rows } = await pool.query(
-    "SELECT * FROM orders WHERE status = 'ENVIADO' AND delivery_id IS NULL ORDER BY created_at ASC"
+    `SELECT status, COUNT(*)::int AS total FROM orders ${where} GROUP BY status`,
+    values
   );
+  const result = { PEDIDO: 0, ENVIADO: 0, ENTREGADO: 0 };
+  for (const r of rows) result[r.status] = r.total;
+  result.total = result.PEDIDO + result.ENVIADO + result.ENTREGADO;
+  return result;
+}
+
+async function findAvailable({ limit, offset } = {}) {
+  const values = [];
+  let sql = "SELECT * FROM orders WHERE status = 'ENVIADO' AND delivery_id IS NULL ORDER BY created_at ASC, id ASC";
+  if (limit !== undefined) {
+    values.push(limit, offset);
+    sql += " LIMIT $1 OFFSET $2";
+  }
+  const { rows } = await pool.query(sql, values);
   return rows;
+}
+
+async function countAvailable() {
+  const { rows } = await pool.query(
+    "SELECT COUNT(*)::int AS total FROM orders WHERE status = 'ENVIADO' AND delivery_id IS NULL"
+  );
+  return rows[0].total;
 }
 
 async function updateStatus(orderId, status) {
@@ -70,20 +110,36 @@ async function deliver(orderId, deliveryId) {
   return rows[0] || null;
 }
 
-async function distinctCustomerIds(restaurantId) {
-  const { rows } = await pool.query("SELECT DISTINCT customer_id FROM orders WHERE restaurant_id = $1", [
-    restaurantId,
-  ]);
+async function distinctCustomerIds(restaurantId, { limit, offset } = {}) {
+  const values = [restaurantId];
+  let sql = "SELECT DISTINCT customer_id FROM orders WHERE restaurant_id = $1 ORDER BY customer_id";
+  if (limit !== undefined) {
+    values.push(limit, offset);
+    sql += " LIMIT $2 OFFSET $3";
+  }
+  const { rows } = await pool.query(sql, values);
   return rows.map((r) => r.customer_id);
+}
+
+async function countDistinctCustomers(restaurantId) {
+  const { rows } = await pool.query(
+    "SELECT COUNT(DISTINCT customer_id)::int AS total FROM orders WHERE restaurant_id = $1",
+    [restaurantId]
+  );
+  return rows[0].total;
 }
 
 module.exports = {
   create,
   findById,
   findByFilters,
+  countByFilters,
+  countByStatus,
   findAvailable,
+  countAvailable,
   updateStatus,
   claim,
   deliver,
   distinctCustomerIds,
+  countDistinctCustomers,
 };

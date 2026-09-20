@@ -5,6 +5,7 @@ const ms2Client = require("../clients/ms2Client");
 const { authenticate, requireRole } = require("../middleware/auth");
 const orderItemModel = require("../models/orderItem");
 const orderModel = require("../models/order");
+const { envelope, parsePaging } = require("../utils/paging");
 
 const router = express.Router();
 
@@ -61,9 +62,26 @@ router.post("/orders", requireRole("customer"), async (req, res) => {
 });
 
 // GET /api/v1/orders/available — pedidos ENVIADO con delivery_id null (para "jalar")
+// Sin page/page_size devuelve todo (array); con ellos, respuesta paginada.
 router.get("/orders/available", requireRole("delivery"), async (req, res) => {
-  const orders = await orderModel.findAvailable();
-  res.json(orders);
+  const paging = parsePaging(req.query);
+  if (paging && paging.error) return res.status(400).json({ error: paging.error });
+
+  if (!paging) {
+    const orders = await orderModel.findAvailable();
+    res.set("X-Total-Count", String(orders.length));
+    return res.json(orders);
+  }
+  const [items, total] = await Promise.all([orderModel.findAvailable(paging), orderModel.countAvailable()]);
+  res.set("X-Total-Count", String(total));
+  res.json(envelope(items, total, paging));
+});
+
+// GET /api/v1/orders/summary — cantidad de pedidos por estado (?restaurant_id= / ?customer_id= / ?delivery_id=)
+// Va antes de /orders/:orderId para que "summary" no se interprete como un id.
+router.get("/orders/summary", async (req, res) => {
+  const { customer_id: customerId, restaurant_id: restaurantId, delivery_id: deliveryId } = req.query;
+  res.json(await orderModel.countByStatus({ customerId, restaurantId, deliveryId }));
 });
 
 // GET /api/v1/orders/:orderId — detalle + items
@@ -75,11 +93,26 @@ router.get("/orders/:orderId", async (req, res) => {
 });
 
 // GET /api/v1/orders — filtros ?customer_id= / ?restaurant_id=&status= / ?delivery_id=
+// Sin page/page_size devuelve todo (array, como siempre); con ellos, respuesta paginada.
 // Nota: sin auth obligatoria, igual que GET /users en MS1 — lo consume MS4 internamente.
 router.get("/orders", async (req, res) => {
   const { customer_id: customerId, restaurant_id: restaurantId, delivery_id: deliveryId, status } = req.query;
-  const orders = await orderModel.findByFilters({ customerId, restaurantId, deliveryId, status });
-  res.json(orders);
+  const filters = { customerId, restaurantId, deliveryId, status };
+
+  const paging = parsePaging(req.query);
+  if (paging && paging.error) return res.status(400).json({ error: paging.error });
+
+  if (!paging) {
+    const orders = await orderModel.findByFilters(filters);
+    res.set("X-Total-Count", String(orders.length));
+    return res.json(orders);
+  }
+  const [items, total] = await Promise.all([
+    orderModel.findByFilters({ ...filters, limit: paging.limit, offset: paging.offset }),
+    orderModel.countByFilters(filters),
+  ]);
+  res.set("X-Total-Count", String(total));
+  res.json(envelope(items, total, paging));
 });
 
 // PUT /api/v1/orders/:orderId/status — PEDIDO -> ENVIADO, solo admin dueño del restaurante

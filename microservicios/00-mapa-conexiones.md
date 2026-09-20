@@ -99,3 +99,18 @@ Todo el tráfico externo entra por **AWS API Gateway (HTTPS) → NGINX en EC2 #1
 - [ ] Timeouts + manejo de error en cascada (MS4 es el más expuesto)
 - [ ] CORS habilitado en los 5 MS para el dominio de Amplify/Vercel
 - [ ] Swagger UI accesible en los 5 (`/docs`, `/swagger-ui.html`, `/api-docs`)
+
+## Convención de paginado (todos los listados grandes)
+
+Los endpoints de listado tienen **dos modos**, en la misma ruta:
+
+| Modo | Cómo se pide | Respuesta |
+|---|---|---|
+| Completo (original) | sin `page` ni `page_size` | array con todo, igual que siempre. Header `X-Total-Count` con el total |
+| Paginado | `?page=1&page_size=20` | `{items, page, page_size, total, total_pages}` |
+
+- `page` desde 1. `page_size` por defecto 20, **máximo 100** (si se pide más se limita y la respuesta informa el tamaño aplicado).
+- Página fuera de rango → `items` vacío (no es error). `page`/`page_size` inválidos → **400** en MS3 y **422** en los servicios FastAPI (MS1, MS4, MS5).
+- El modo completo se mantiene por compatibilidad (seeds, llamadas internas). Las pantallas usan el paginado.
+- Endpoints con paginado: MS1 `GET /users`; MS3 `GET /orders`, `GET /orders/available`, `GET /restaurants/{id}/customers`; MS4 los 3 dashboards; MS5 `GET /analytics/user-metrics` (aquí `data` sigue siendo un array y se agregan `page/page_size/total/total_pages`).
+- Extras para no traer miles de filas: MS3 `GET /orders/summary` (conteo por estado). MS4 modo paginado del dashboard admin: `?status=PEDIDO|ENVIADO|ENTREGADO&page=&page_size=&customers_page=`; delivery: `?page=&page_size=&curso_page=`.

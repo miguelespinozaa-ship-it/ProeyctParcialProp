@@ -1229,6 +1229,1159 @@
           }
         }
       ]
+    },
+    {
+      "name": "MS1 - Usuarios (paginado)",
+      "item": [
+        {
+          "name": "users paginado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users?rol=customer&page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "rol",
+                  "value": "customer"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"header X-Total-Count = total\", () => pm.expect(Number(pm.response.headers.get(\"X-Total-Count\"))).to.eql(j.total));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "users page_size=1000 se limita a 100",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users?page=1&page_size=1000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "1000"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"<=100\", () => pm.expect(j.page_size).to.be.at.most(100));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "users ids= sigue funcionando (modo batch, array)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users?ids=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "users page=0 -> 422 (validación FastAPI)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms1/api/v1/users?page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms1",
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MS3 - Pedidos (paginado)",
+      "item": [
+        {
+          "name": "orders paginado (page=1,page_size=5)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?restaurant_id={{restaurant_id}}&page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "restaurant_id",
+                  "value": "{{restaurant_id}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"page_size=5\", () => pm.expect(j.page_size).to.eql(5));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders página 2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?restaurant_id={{restaurant_id}}&page=2&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "restaurant_id",
+                  "value": "{{restaurant_id}}"
+                },
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"page=2\", () => pm.expect(j.page).to.eql(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders filtro status + paginado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?restaurant_id={{restaurant_id}}&status=PEDIDO&page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "restaurant_id",
+                  "value": "{{restaurant_id}}"
+                },
+                {
+                  "key": "status",
+                  "value": "PEDIDO"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"todos PEDIDO\", () => j.items.forEach(o => pm.expect(o.status).to.eql(\"PEDIDO\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders page_size=1000 se limita a 100",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?restaurant_id={{restaurant_id}}&page=1&page_size=1000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "restaurant_id",
+                  "value": "{{restaurant_id}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "1000"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"page_size aplicado <= 100\", () => pm.expect(j.page_size).to.be.at.most(100));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders página fuera de rango -> lista vacía",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?restaurant_id={{restaurant_id}}&page=99999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "restaurant_id",
+                  "value": "{{restaurant_id}}"
+                },
+                {
+                  "key": "page",
+                  "value": "99999999"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"items vacío\", () => pm.expect(j.items.length).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders page=0 -> 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders page=abc -> 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?page=abc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "abc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders page_size=-5 -> 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?page_size=-5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "page_size",
+                  "value": "-5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders SIN page -> sigue devolviendo array (modo original)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders?customer_id={{customer_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "customer_id",
+                  "value": "{{customer_id}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"es array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"header X-Total-Count\", () => pm.expect(pm.response.headers.get(\"X-Total-Count\")).to.exist);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders/summary (conteo por estado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/summary?restaurant_id={{restaurant_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "restaurant_id",
+                  "value": "{{restaurant_id}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200 y suma coherente\", () => { pm.response.to.have.status(200); pm.expect(j.PEDIDO + j.ENVIADO + j.ENTREGADO).to.eql(j.total); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders/available paginado (delivery)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_delivery}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/available?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "available"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "orders/available paginado sin token -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/orders/available?page=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "orders",
+                "available"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "clientes del restaurante paginado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms3/api/v1/restaurants/{{restaurant_id}}/customers?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms3",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"sobre paginado {items,page,page_size,total,total_pages}\", () => {",
+                  "  pm.expect(j).to.include.keys(\"items\",\"page\",\"page_size\",\"total\",\"total_pages\");",
+                  "  pm.expect(j.items).to.be.an(\"array\");",
+                  "  pm.expect(j.items.length).to.be.at.most(j.page_size);",
+                  "  pm.expect(j.total_pages).to.eql(Math.ceil(j.total / j.page_size));",
+                  "});",
+                  "pm.test(\"trae datos de MS1\", () => j.items.forEach(u => pm.expect(u).to.include.keys(\"id\",\"nombre\",\"email\")));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MS4 - Dashboards (paginado)",
+      "item": [
+        {
+          "name": "admin paginado (estado PEDIDO)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/admin/{{admin_restaurant_id}}/summary?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "admin",
+                "{{admin_restaurant_id}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"resumen + pedidos paginados + clientes\", () => {",
+                  "  pm.expect(j.resumen).to.include.keys(\"PEDIDO\",\"ENVIADO\",\"ENTREGADO\",\"total\");",
+                  "  pm.expect(j.estado).to.eql(\"PEDIDO\");",
+                  "  pm.expect(j.pedidos.items.length).to.be.at.most(5);",
+                  "  pm.expect(j.pedidos.total).to.eql(j.resumen.PEDIDO);",
+                  "  pm.expect(j.clientes).to.include.keys(\"items\",\"total\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "admin paginado estado ENVIADO",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/admin/{{admin_restaurant_id}}/summary?status=ENVIADO&page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "admin",
+                "{{admin_restaurant_id}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ENVIADO"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"solo ENVIADO\", () => { pm.expect(j.estado).to.eql(\"ENVIADO\"); j.pedidos.items.forEach(o => pm.expect(o.status).to.eql(\"ENVIADO\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "admin status inválido -> 422",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/admin/{{admin_restaurant_id}}/summary?status=XXX",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "admin",
+                "{{admin_restaurant_id}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "XXX"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "customer paginado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/customer/{{customer_id}}/summary?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "customer",
+                "{{customer_id}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"resumen + historial paginado\", () => { pm.expect(j.resumen).to.include.keys(\"total\"); pm.expect(j.historial).to.include.keys(\"items\",\"total_pages\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "delivery paginado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_delivery}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/delivery/{{delivery_id}}/summary?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "delivery",
+                "{{delivery_id}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"disponibles y en_curso paginados\", () => { pm.expect(j.disponibles).to.include.keys(\"items\",\"total\"); pm.expect(j.en_curso).to.include.keys(\"items\",\"total\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "dashboard page=0 -> 422",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/dashboard/customer/{{customer_id}}/summary?page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "dashboard",
+                "customer",
+                "{{customer_id}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MS5 - Analítica (paginado)",
+      "item": [
+        {
+          "name": "user-metrics paginado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/api/v1/analytics/user-metrics?page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "api",
+                "v1",
+                "analytics",
+                "user-metrics"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"data <= page_size y campos de paginación\", () => {",
+                  "  pm.expect(j.data.length).to.be.at.most(5);",
+                  "  pm.expect(j).to.include.keys(\"page\",\"page_size\",\"total\",\"total_pages\",\"source\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "user-metrics page=0 -> 422",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ms5/api/v1/analytics/user-metrics?page=0",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms5",
+                "api",
+                "v1",
+                "analytics",
+                "user-metrics"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [

@@ -1,15 +1,26 @@
 import { useEffect, useState } from "react";
 import { topRestaurants, userMetrics } from "../../api/ms5";
 import NavBar from "../../components/NavBar";
+import Pagination from "../../components/Pagination";
+
+const METRICS_PAGE_SIZE = 10;
 
 export default function AdminAnalytics() {
   const [restaurants, setRestaurants] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [metrics, setMetrics] = useState(null);
+  const [page, setPage] = useState(1);
+  const [loadingPage, setLoadingPage] = useState(false);
 
   useEffect(() => {
     topRestaurants().then((r) => setRestaurants(r.data));
-    userMetrics().then((r) => setUsers(r.data));
   }, []);
+
+  useEffect(() => {
+    setLoadingPage(true);
+    userMetrics({ page, page_size: METRICS_PAGE_SIZE })
+      .then(setMetrics)
+      .finally(() => setLoadingPage(false));
+  }, [page]);
 
   return (
     <div>
@@ -50,7 +61,7 @@ export default function AdminAnalytics() {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {(metrics?.data || []).map((u) => (
               <tr key={u.usuario_id}>
                 <td>{u.nombre}</td>
                 <td>{u.num_pedidos}</td>
@@ -60,6 +71,16 @@ export default function AdminAnalytics() {
             ))}
           </tbody>
         </table>
+        {!metrics && <p className="loading">Consultando Athena...</p>}
+        {metrics && (
+          <Pagination
+            page={metrics.page}
+            totalPages={metrics.total_pages}
+            total={metrics.total}
+            onChange={setPage}
+            disabled={loadingPage}
+          />
+        )}
       </main>
     </div>
   );

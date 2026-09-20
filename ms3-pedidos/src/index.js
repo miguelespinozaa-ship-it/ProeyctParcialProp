@@ -8,7 +8,7 @@ const ordersRouter = require("./routes/orders");
 const openapiSpec = require("./openapi.json");
 
 const app = express();
-app.use(cors());
+app.use(cors({ exposedHeaders: ["X-Total-Count"] }));
 app.use(express.json());
 
 app.use("/api/v1", ordersRouter);

@@ -1,50 +1,335 @@
 {
   "openapi": "3.0.0",
-  "info": { "title": "MS3 - Pedidos", "version": "1.0.0" },
+  "info": {
+    "title": "MS3 - Pedidos",
+    "version": "1.0.0"
+  },
   "paths": {
     "/api/v1/orders": {
-      "post": { "summary": "Crear pedido (customer)", "responses": { "201": { "description": "Creado" } } },
+      "post": {
+        "summary": "Crear pedido (customer)",
+        "responses": {
+          "201": {
+            "description": "Creado"
+          }
+        }
+      },
       "get": {
         "summary": "Listar pedidos (filtros customer_id, restaurant_id, delivery_id, status)",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "Array con todo, o {items, page, page_size, total, total_pages} si se pidió page/page_size",
+            "headers": {
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total de registros"
+              }
+            }
+          },
+          "400": {
+            "description": "page/page_size inválidos"
+          }
+        },
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtra por cliente"
+          },
+          {
+            "name": "restaurant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtra por restaurante"
+          },
+          {
+            "name": "delivery_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtra por repartidor"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "PEDIDO | ENVIADO | ENTREGADO"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Activa el paginado (desde 1). Sin page/page_size devuelve todo (array)."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Tamaño de página (máximo 100; se limita si se pide más)."
+          }
+        ]
       }
     },
     "/api/v1/orders/available": {
-      "get": { "summary": "Pedidos disponibles para jalar (delivery)", "responses": { "200": { "description": "OK" } } }
+      "get": {
+        "summary": "Pedidos disponibles para jalar (delivery)",
+        "responses": {
+          "200": {
+            "description": "Array con todo, o {items, page, page_size, total, total_pages} si se pidió page/page_size",
+            "headers": {
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total de registros"
+              }
+            }
+          },
+          "400": {
+            "description": "page/page_size inválidos"
+          },
+          "401": {
+            "description": "Falta token"
+          },
+          "403": {
+            "description": "No es delivery"
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Activa el paginado (desde 1). Sin page/page_size devuelve todo (array)."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Tamaño de página (máximo 100; se limita si se pide más)."
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/summary": {
+      "get": {
+        "summary": "Cantidad de pedidos por estado (sin traer las filas)",
+        "parameters": [
+          {
+            "name": "restaurant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtra por restaurante"
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtra por cliente"
+          },
+          {
+            "name": "delivery_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtra por repartidor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{PEDIDO, ENVIADO, ENTREGADO, total}"
+          }
+        }
+      }
     },
     "/api/v1/orders/{orderId}": {
       "get": {
         "summary": "Detalle de pedido",
-        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
-        "responses": { "200": { "description": "OK" }, "404": { "description": "No encontrado" } }
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "No encontrado"
+          }
+        }
       }
     },
     "/api/v1/orders/{orderId}/status": {
       "put": {
         "summary": "PEDIDO -> ENVIADO (admin dueño del restaurante)",
-        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
-        "responses": { "200": { "description": "OK" }, "403": { "description": "No autorizado" } }
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "403": {
+            "description": "No autorizado"
+          }
+        }
       }
     },
     "/api/v1/orders/{orderId}/claim": {
       "put": {
         "summary": "Delivery jala el pedido (ENVIADO, sin asignar)",
-        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
-        "responses": { "200": { "description": "OK" }, "409": { "description": "No disponible" } }
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "description": "No disponible"
+          }
+        }
       }
     },
     "/api/v1/orders/{orderId}/deliver": {
       "put": {
         "summary": "ENVIADO -> ENTREGADO (delivery asignado)",
-        "parameters": [{ "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }],
-        "responses": { "200": { "description": "OK" }, "409": { "description": "No permitido" } }
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "description": "No permitido"
+          }
+        }
       }
     },
     "/api/v1/restaurants/{restaurantId}/customers": {
       "get": {
         "summary": "Clientes distintos del restaurante (nombres resueltos vía MS1)",
-        "parameters": [{ "name": "restaurantId", "in": "path", "required": true, "schema": { "type": "string" } }],
-        "responses": { "200": { "description": "OK" } }
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Activa el paginado (desde 1). Sin page/page_size devuelve todo (array)."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Tamaño de página (máximo 100; se limita si se pide más)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array con todo, o {items, page, page_size, total, total_pages} si se pidió page/page_size",
+            "headers": {
+              "X-Total-Count": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Total de registros"
+              }
+            }
+          },
+          "400": {
+            "description": "page/page_size inválidos"
+          },
+          "502": {
+            "description": "MS1 no disponible"
+          }
+        }
       }
     }
   }

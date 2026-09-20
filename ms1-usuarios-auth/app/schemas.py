@@ -73,3 +73,11 @@ class DireccionOut(DireccionCreate):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedUsuarios(BaseModel):
+    items: list[UsuarioOut]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int

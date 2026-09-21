@@ -356,3 +356,56 @@ th {
   font-size: 0.9em;
   color: #555;
 }
+
+/* Reseñas */
+.reviews {
+  margin-top: 32px;
+}
+
+.review-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-list li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.review-list p {
+  margin: 4px 0 0;
+}
+
+.review-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.stars {
+  color: #e0a800;
+  letter-spacing: 2px;
+}
+
+.review-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 480px;
+}
+
+.review-form textarea {
+  min-height: 70px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}

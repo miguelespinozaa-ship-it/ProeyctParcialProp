@@ -28,6 +28,12 @@ public class ReviewController {
 
     @PostMapping
     public Resena crear(@PathVariable String restaurantId, @RequestBody Resena resena) {
+        if (resena.getPuntuacion() < 1 || resena.getPuntuacion() > 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La puntuación debe estar entre 1 y 5");
+        }
+        if (resena.getComentario() == null || resena.getComentario().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El comentario es requerido");
+        }
         Restaurante restaurante = findRestaurante(restaurantId);
         resena.setFecha(Instant.now());
         restaurante.getResenas().add(resena);

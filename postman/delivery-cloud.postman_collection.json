@@ -769,6 +769,52 @@
               }
             }
           }
+        },
+        {
+          "name": "Create review puntuacion invalida (debe dar 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms2/api/v1/restaurants/{{restaurant_id}}/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms2",
+                "api",
+                "v1",
+                "restaurants",
+                "{{restaurant_id}}",
+                "reviews"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"usuario_id\": 1, \"comentario\": \"Muy rico\", \"puntuacion\": 9}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },

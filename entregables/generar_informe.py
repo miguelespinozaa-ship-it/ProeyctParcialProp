@@ -409,8 +409,8 @@ def construir(autores):
     # ---------------- 9. Pruebas
     E += [P("9. Pruebas y validación", "h1"),
           tabla([["Prueba", "Alcance", "Resultado"],
-                 ["Colección Postman / Newman", "72 requests sobre los 5 servicios: flujo completo, casos de error (400, 401, 422) y modos con y sin paginado", "72 ejecutadas · 66 aserciones · 0 fallos, en local y a través del API Gateway"],
-                 ["Navegador (Playwright)", "Flujos por rol en Chromium contra la URL de Amplify: pestañas y paginado del admin, pool del delivery, grilla de restaurantes, pedido, tracking y reseñas", "Todas las comprobaciones correctas y sin errores de consola"],
+                 ["Colección Postman / Newman", "73 requests sobre los 5 servicios: flujo completo, casos de error (400, 401, 422) y modos con y sin paginado", "73 ejecutadas · 69 aserciones · 0 fallos, en local y a través del API Gateway"],
+                 ["Navegador (Playwright), recorrido E2E", "Registro de customer, pedido, reseña, despacho del admin, toma y entrega del repartidor, tracking ENTREGADO, analítica con Athena y rutas protegidas, sobre la URL de Amplify y el backend en AWS (pruebas/e2e_full.mjs)", "23 de 23 comprobaciones correctas; el único error de consola es el 409 provocado a propósito al intentar tomar dos veces el mismo pedido"],
                  ["Balanceo y failover", "30 peticiones repartidas; NGINX detenido en una VM", "14 / 13 entre las dos VMs; con una caída, 30 de 30 respuestas 200"],
                  ["Aislamiento de la BD", "Sondeo de puertos 22, 3306, 5432 y 27017 desde internet", "Todos cerrados"]],
                 [3.6 * cm, 8.0 * cm, W - 11.6 * cm])]

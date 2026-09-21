@@ -88,7 +88,7 @@ function imgAjustada(s, ruta, x, y, wMax, hMax) {
   titulo(s, "El proyecto en cifras");
   const datos = [
     ["5", "microservicios en Docker"], ["3", "lenguajes y 3 bases de datos (2 SQL, 1 NoSQL)"], ["20,000+", "registros en cada base de datos"],
-    ["4", "máquinas virtuales (2 de App balanceadas)"], ["72", "requests de Postman · 66 aserciones · 0 fallos"], ["4 + 2", "consultas con JOIN y vistas en Athena"],
+    ["4", "máquinas virtuales (2 de App balanceadas)"], ["73", "requests de Postman · 69 aserciones · 0 fallos"], ["4 + 2", "consultas con JOIN y vistas en Athena"],
   ];
   datos.forEach(([v, t], i) => cifra(s, 0.6 + (i % 3) * 3.05, 1.5 + Math.floor(i / 3) * 1.85, 2.8, v, t));
   s.addNotes("Cifras clave. Cada base de datos tiene más de 20,000 registros cargados de una sola vez con scripts incluidos en el repositorio.");
@@ -293,8 +293,8 @@ function imgAjustada(s, ruta, x, y, wMax, hMax) {
 {
   const s = claro();
   titulo(s, "Pruebas y validación");
-  cifra(s, 0.6, 1.3, 2.8, "72", "requests de Postman/Newman · 66 aserciones · 0 fallos");
-  cifra(s, 3.6, 1.3, 2.8, "3 roles", "recorridos completos con Playwright sobre la URL de Amplify");
+  cifra(s, 0.6, 1.3, 2.8, "73", "requests de Postman/Newman · 69 aserciones · 0 fallos");
+  cifra(s, 3.6, 1.3, 2.8, "23 / 23", "comprobaciones del recorrido E2E en navegador (3 roles)");
   cifra(s, 6.6, 1.3, 3.0, "30 / 30", "respuestas 200 con una de las 2 VMs caída");
   const pts = ["Casos de error incluidos: 400, 401 y 422; con y sin paginado", "Conteos de Athena coinciden con las bases de datos", "Puertos 22, 3306, 5432 y 27017 cerrados a internet",
     "Swagger UI verificado en los 5 servicios a través del API Gateway"];

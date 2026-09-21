@@ -1,20 +1,4 @@
--- Queries y vistas sobre el Data Catalog de Glue (database: ubereats_datalake).
--- Corridas y verificadas contra datos reales (Fase 9 ejecutada) — las 4 queries y las 2 vistas
--- devuelven filas reales, no son solo SQL "de papel".
---
--- 2 quirks reales encontrados y corregidos al correr esto contra el catálogo real:
--- 1) El crawler catalogó la colección de Mongo como tabla "mongodb" (no "restaurantes") —
---    pasa cuando un prefijo S3 solo tiene una subcarpeta hija.
--- 2) El _id de Mongo se exportó como {"$oid": "..."} (json_util.default de bson), así que
---    Glue lo infirió como struct row($oid varchar), no como string plano — hay que acceder
---    a r._id."$oid" (comillas obligatorias por el símbolo $), si no: TYPE_MISMATCH al comparar
---    contra el restaurant_id (varchar) de orders.
--- 3) direcciones.es_principal (BOOLEAN en MySQL) llegó como bigint (0/1) al catálogo de Glue,
---    no como boolean — comparar contra `1`, no contra `true`.
---
--- Nota sobre "rango de edad": el modelo de usuarios (MS1) no tiene fecha de nacimiento,
--- solo fecha_registro. v_metricas_usuarios usa "antigüedad de cuenta" como sustituto real
--- en vez de inventar una edad que no existe en la fuente.
+
 
 -- ============================================================
 -- 1) Ventas totales por restaurante (orders + order_items + mongodb)

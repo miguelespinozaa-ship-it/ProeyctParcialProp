@@ -1,3 +1,4 @@
+import { mensajeError } from "../api/errores";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login as loginApi } from "../api/ms1";
@@ -29,7 +30,7 @@ export default function Login() {
       else if (data.rol === "delivery") navigate("/delivery");
       else navigate("/customer");
     } catch (err) {
-      setError(err.response?.data?.detail || "Credenciales inválidas");
+      setError(mensajeError(err, "Credenciales inválidas"));
     } finally {
       setSubmitting(false);
     }

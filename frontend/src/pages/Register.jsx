@@ -1,3 +1,4 @@
+import { mensajeError } from "../api/errores";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register as registerApi } from "../api/ms1";
@@ -21,7 +22,7 @@ export default function Register() {
       login({ token: data.token, rol: data.rol, userId: data.id });
       navigate(data.rol === "delivery" ? "/delivery" : "/customer");
     } catch (err) {
-      setError(err.response?.data?.detail || "No se pudo crear la cuenta");
+      setError(mensajeError(err, "No se pudo crear la cuenta"));
     } finally {
       setSubmitting(false);
     }

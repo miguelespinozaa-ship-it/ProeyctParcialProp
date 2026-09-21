@@ -62,7 +62,7 @@ Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y d
 | Bases de datos (MySQL, PostgreSQL, MongoDB) | EC2 DB Tier (`docker-compose.db.yml`); solo aceptan tráfico del Security Group de la App Tier, sin puertos abiertos a internet |
 | Carga masiva | 20,007 `usuarios` (MS1, `seed.py`), 20,009 `orders` (MS3, `seed.js`) y 20,000 `restaurantes` (MS2, `seed.js` en mongosh) |
 | API Gateway (HTTPS) | Expone `/ms1` ... `/ms5` y llega al ALB interno por un **VPC Link** |
-| Frontend SPA (React + Vite) | AWS Amplify, consume el API Gateway por HTTPS |
+| Frontend SPA (React + Vite) | AWS Amplify con **CI/CD desde GitHub** (cada push a `main` compila y despliega, ver [amplify.yml](amplify.yml)): https://main.d2wzxjgeu63fi4.amplifyapp.com — consume el API Gateway por HTTPS |
 | MV de ingesta | EC2 dedicada `PP-Ingest-VM` (SG propio sin entradas, rol `LabInstanceProfile`). Ejecuta los 3 contenedores ETL por IP privada hacia la BD |
 | Data lake | 3 contenedores de ingesta -> S3 (snapshot completo, sin duplicados) -> Glue Crawler -> Athena (2 vistas). MS5 consulta Athena real (`ATHENA_MOCK=false`) |
 | Paginado | Opt-in en los listados grandes (`?page=&page_size=`), ver [00-mapa-conexiones.md](microservicios/00-mapa-conexiones.md) |
@@ -73,7 +73,6 @@ Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y d
 Flujo: `Amplify (HTTPS) -> API Gateway -> VPC Link -> ALB interno -> NGINX (VM 1 o VM 2) -> microservicios -> DB Tier`. El ALB solo acepta tráfico del security group del VPC Link.
 Para comprobar el reparto: `for i in $(seq 1 20); do curl -sI https://<gateway>/ms1/health | grep -i x-served-by; done`. Si una VM cae, el ALB la saca de rotación en ~30 s y la otra atiende todo.
 
-- **Amplify por despliegue manual** (zip): no está conectado a GitHub para CI/CD.
 - **Postman:** [postman/delivery-cloud.postman_collection.json](postman/delivery-cloud.postman_collection.json) cubre los 5 microservicios (71 requests, 65 assertions) y apunta por defecto al API Gateway HTTPS. Contra local: `--env-var "base_url=http://localhost"`.
 
 ## Estructura
@@ -102,4 +101,4 @@ amplify.yml                  build de AWS Amplify para el frontend (CI/CD desde 
 
 ## CI/CD del frontend (AWS Amplify)
 
-[amplify.yml](amplify.yml) compila la SPA de `frontend/` (`npm ci` + `npm run build`) y usa por defecto el API Gateway del proyecto (`VITE_API_BASE_URL` puede sobreescribirse en Amplify). Para desplegar en cada `git push` a `main`: Amplify → *Create new app* → *GitHub* → autorizar → repositorio `ProeyctParcialProp`, rama `main` (marcar *monorepo* con carpeta `frontend`) → agregar la regla de reescritura `/<*>` → `/index.html` (200).
+La aplicación de Amplify está conectada a este repositorio (rama `main`): cada `git push` dispara una compilación y un despliegue automáticos. [amplify.yml](amplify.yml) compila la SPA de `frontend/` (Node 22, `npm ci` + `npm run build`). La variable `VITE_API_BASE_URL` (API Gateway del proyecto) se define en Amplify → *Variables de entorno*, y hay una regla de reescritura de rutas para la SPA (`/<*>` → `/index.html`, 200).

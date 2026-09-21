@@ -8,7 +8,7 @@ const AQUI = __dirname;
 const DIAG = path.join(AQUI, "..", "infra", "diagramas");
 const CAP = path.join(AQUI, "capturas");
 const REPO = "github.com/miguelespinozaa-ship-it/ProeyctParcialProp";
-const AMPLIFY = "main.duqtfdxa5tvcw.amplifyapp.com";
+const AMPLIFY = "main.d2wzxjgeu63fi4.amplifyapp.com";
 const GATEWAY = "jt3z0elcud.execute-api.us-east-1.amazonaws.com";
 
 const NAVY = "232F3E", NARANJA = "ED7100", CLARO = "F2F4F7", GRIS = "5F6B7A", BLANCO = "FFFFFF", TEXTO = "1F2933";
@@ -189,7 +189,7 @@ function imgAjustada(s, ruta, x, y, wMax, hMax) {
     s.addImage({ path: path.join(CAP, f), x, y: 1.4, w: 2.95, h: 2.95 * 780 / 1280, shadow: sombra() });
     s.addText(t, { x, y: 1.4 + 2.95 * 780 / 1280 + 0.1, w: 2.95, h: 0.5, fontFace: F, fontSize: 12, bold: true, color: NAVY, margin: 0, valign: "top", isTextBox: true });
   });
-  s.addText("Consume los 5 microservicios por el API Gateway: 5 · 9 · 8 · 4 · 2 llamadas REST hacia MS1 … MS5 (el mínimo pedido era 2 por servicio).",
+  s.addText("CI/CD desde GitHub: cada push a main se despliega solo. Consume los 5 microservicios por el API Gateway: 5 · 9 · 8 · 4 · 2 llamadas REST hacia MS1 … MS5 (el mínimo pedido era 2 por servicio).",
     { x: 0.4, y: 4.55, w: 9.2, h: 0.6, fontFace: F, fontSize: 13, color: GRIS, italic: true, margin: 0, valign: "top", isTextBox: true });
   s.addNotes("La SPA tiene login y rutas por rol. Se despliega en AWS Amplify y habla con el API Gateway por HTTPS.");
 }
@@ -308,8 +308,8 @@ function imgAjustada(s, ruta, x, y, wMax, hMax) {
 {
   const s = claro();
   titulo(s, "Limitaciones y próximos pasos");
-  const izq = ["Las VMs aún aceptan el puerto 80 desde internet: cerrar y dejar solo el ALB", "Amplify se despliega con un zip: conectar GitHub para CI/CD", "VMs t2.micro (1 GB) con swap: subir a t3.small"];
-  const der = ["Derivar el usuario de las reseñas del token JWT", "Programar la ingesta y el crawler (EventBridge)", "Excluir password_hash del data lake"];
+  const izq = ["Las VMs aún aceptan el puerto 80 desde internet: cerrar y dejar solo el ALB", "VMs t2.micro (1 GB) con swap: subir a t3.small"];
+  const der = ["Derivar el usuario de las reseñas del token JWT", "Programar la ingesta y el crawler (EventBridge)", "Ejecutar pruebas automáticas en el pipeline de CI", "Excluir password_hash del data lake"];
   [["Limitaciones actuales", izq, 0.5], ["Próximos pasos", der, 5.1]].forEach(([t, b, x]) => {
     tarjeta(s, x, 1.3, 4.4, 3.4, CLARO);
     s.addText(t, { x: x + 0.2, y: 1.42, w: 4.0, h: 0.4, fontFace: F, fontSize: 16, bold: true, color: NARANJA, margin: 0, isTextBox: true });

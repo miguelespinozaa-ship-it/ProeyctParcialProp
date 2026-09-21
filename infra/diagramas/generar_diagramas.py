@@ -444,9 +444,11 @@ def arquitectura():
     d.caja(20, 430, 120, 90, "Usuario\nNavegador web\ncustomer · admin\ndelivery", "user", 12)
     d.grupo(170, 20, 1710, 1110, "AWS Cloud — región us-east-1", "#232F3E", dash=True, fs=15)
     d.grupo(190, 50, 260, 130, "FRONTEND", "#DD344C", "#FFFFFF", fs=12)
-    d.caja(205, 82, 230, 82, "AWS Amplify\nSPA React + Vite\nmain.duqtfdxa5tvcw.amplifyapp.com", "front", 12)
+    d.caja(205, 82, 230, 82, "AWS Amplify\nSPA React + Vite · CI/CD\nmain.d2wzxjgeu63fi4.amplifyapp.com", "front", 12)
     d.caja(250, 430, 200, 90, "Amazon API Gateway\nHTTP API · HTTPS\n/ms1 … /ms5 → VPC Link", "apigw", 13)
     d.flecha([(80, 430), (80, 123), (205, 123)], "1. carga la SPA", (128, 140), fs=11)
+    d.caja(520, 74, 200, 90, "GitHub (repo público)\npush a main → Amplify\ncompila y despliega", "user", 12)
+    d.flecha([(520, 123), (435, 123)], "CI/CD", (478, 108), fs=11)
     d.flecha([(140, 475), (250, 475)], "2. REST/HTTPS", (195, 455), fs=11)
     # VPC
     d.grupo(470, 200, 1390, 590, "VPC por defecto  ·  subredes us-east-1a / us-east-1b", "#248814", "#FBFDFB", fs=14)
@@ -503,6 +505,7 @@ def arquitectura():
             "  (S3, Athena, Glue, SSM); sin claves en el código.\n"
             "• JWT HS256 compartido entre MS1, MS2 y MS3;\n"
             "  MS4 reenvía el token del usuario.\n"
+            "• Amplify se despliega solo con cada push a main\n  (CI/CD desde GitHub).\n"
             "• Health check del ALB cada 15 s: si una VM cae,\n"
             "  la otra atiende todo el tráfico.", 12.5)
     return d

@@ -35,7 +35,7 @@ CLARO = colors.HexColor("#F2F4F7")
 LINEA = colors.HexColor("#D0D5DD")
 
 REPO = "https://github.com/miguelespinozaa-ship-it/ProeyctParcialProp"
-AMPLIFY = "https://main.duqtfdxa5tvcw.amplifyapp.com"
+AMPLIFY = "https://main.d2wzxjgeu63fi4.amplifyapp.com"
 GATEWAY = "https://jt3z0elcud.execute-api.us-east-1.amazonaws.com"
 
 S = {
@@ -227,7 +227,7 @@ def construir(autores):
             "2 EC2 de App detrás de un ALB interno; API Gateway → VPC Link → ALB; BD en EC2 sin puertos abiertos a internet", "6"],
            ["Documentar las 5 APIs en Swagger UI", "Swagger UI accesible en los 5 servicios, incluso a través del API Gateway", "6.5"],
            ["Aplicación web que consuma los 5 servicios (≥ 2 métodos REST por servicio) desplegada en Amplify",
-            f"SPA React: {api[1]}, {api[2]}, {api[3]}, {api[4]} y {api[5]} llamadas REST a MS1 … MS5; desplegada en AWS Amplify", "5"],
+            f"SPA React: {api[1]}, {api[2]}, {api[3]}, {api[4]} y {api[5]} llamadas REST a MS1 … MS5; desplegada en AWS Amplify con CI/CD desde GitHub", "5"],
            ["MV de ingesta, bucket S3 y 3 contenedores Python de ingesta (pull del 100 %)", "PP-Ingest-VM con 3 contenedores; S3 con snapshot completo por tabla", "7.1"],
            ["Catálogo en Glue y diagrama E/R que relacione las tablas del catálogo", "Crawler sobre S3, 5 tablas; diagrama E/R del catálogo", "7.2"],
            ["4 consultas SQL con JOIN en Athena y 2 vistas", "Ejecutadas en Athena con evidencia (ID de ejecución y resultados)", "7.3"],
@@ -322,7 +322,7 @@ def construir(autores):
                  ["PP-Ingest-VM", "EC2 t2.micro, us-east-1a · 3 contenedores de ingesta en Python"],
                  ["pp-alb-interno", "Application Load Balancer interno, target group pp-app-tg (las dos VMs de App), health check GET /health cada 15 s"],
                  ["VPC Link + API Gateway", "HTTP API con integración privada (VPC Link) hacia el listener del ALB; protocolo HTTPS hacia el cliente"],
-                 ["AWS Amplify", "Aplicación de una sola rama (main); despliegue del build de la SPA"],
+                 ["AWS Amplify", "Conectado al repositorio de GitHub (rama main): cada push compila y despliega la SPA con amplify.yml (Node 22)"],
                  ["S3 · Glue · Athena", "Bucket pp-ubereats-datalake-…; base ubereats_datalake y crawler pp-crawler; workgroup pp-workgroup"]],
                 [4.0 * cm, W - 4.0 * cm]),
           P("6.2 Red y seguridad", "h2"),
@@ -341,7 +341,7 @@ def construir(autores):
             "las 30 peticiones siguientes las atendió app-1, todas con código 200. Al reiniciar NGINX, la VM volvió a rotación.")]
     E += [P("6.4 Cómo se actualiza", "h2"),
           P("El código se despliega con git pull y docker compose up --build en cada VM (en segundo plano, con swap de 2.5 GB porque las VMs t2.micro tienen 1 GB de RAM), "
-            "y después se reinicia NGINX, que resuelve las IPs de los contenedores al arrancar. El frontend se recompila con la URL del API Gateway y se sube a Amplify.")]
+            "y después se reinicia NGINX, que resuelve las IPs de los contenedores al arrancar. El frontend se despliega solo: cada push a la rama main de GitHub dispara en Amplify la compilación y el despliegue.")]
     E += [P("6.5 Documentación Swagger", "h2"),
           tabla([["Servicio", "URL de Swagger UI (a través del API Gateway)"],
                  ["MS1", GATEWAY + "/ms1/docs"], ["MS2", GATEWAY + "/ms2/swagger-ui.html"], ["MS3", GATEWAY + "/ms3/api-docs/"],
@@ -425,7 +425,6 @@ def construir(autores):
     # ---------------- 11. Limitaciones
     E += [P("11. Limitaciones y trabajo futuro", "h1")] + B([
         "<b>Puerto 80 de las VMs de App.</b> El tráfico de producción entra por API Gateway → ALB, pero las VMs aún aceptan el puerto 80 desde internet (por ejemplo por la IP elástica). Cerrarlo es una regla de red.",
-        "<b>CI/CD del frontend.</b> Amplify se despliega subiendo el build; conectar la rama main de GitHub permitiría despliegues automáticos.",
         "<b>Recursos limitados.</b> Las VMs t2.micro (1 GB de RAM) funcionan con swap; en producción convendría t3.small o superior.",
         "<b>Reseñas.</b> MS2 toma el usuario_id del cuerpo de la petición y no del token; debería derivarse del JWT.",
         "<b>Data lake.</b> La ingesta es manual (bajo demanda); se podría programar con EventBridge y automatizar el crawler."])

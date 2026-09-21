@@ -2608,7 +2608,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://34.207.211.137"
+      "value": "https://jt3z0elcud.execute-api.us-east-1.amazonaws.com"
     },
     {
       "key": "token_customer",

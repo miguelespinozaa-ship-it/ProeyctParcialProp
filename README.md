@@ -1,6 +1,6 @@
 # Proyecto Parcial Cloud — Plataforma de Delivery (Microservicios)
 
-Monorepo con 5 microservicios + frontend SPA + pipeline de datos, desplegado en AWS (EC2 App Tier + EC2 DB Tier + EC2 de ingesta, API Gateway, Amplify, S3/Glue/Athena).
+Monorepo con 5 microservicios + frontend SPA + pipeline de datos, desplegado en AWS (2 EC2 App Tier con balanceador interno, EC2 DB Tier privada, EC2 de ingesta, API Gateway HTTPS, Amplify, S3/Glue/Athena).
 
 ## Documentación
 
@@ -57,21 +57,24 @@ Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y d
 
 | Pieza | Estado |
 |---|---|
-| 5 microservicios (FastAPI, Spring Boot, Express) | Desplegados en la EC2 App Tier con NGINX (`docker-compose.app.yml`) |
+| 5 microservicios (FastAPI, Spring Boot, Express) | Desplegados en **2 EC2 de App** (`PP-App-Tier` en us-east-1a y `PP-App-Tier-2` en us-east-1b), cada una con `docker-compose.app.yml` y NGINX |
+| Balanceador de carga | **ALB interno** (`pp-alb-interno`, sin IP pública) reparte entre las 2 VMs con health check a `/health`. NGINX de cada VM enruta por path a los 5 servicios y devuelve `X-Served-By` con la VM que atendió |
 | Bases de datos (MySQL, PostgreSQL, MongoDB) | EC2 DB Tier (`docker-compose.db.yml`); solo aceptan tráfico del Security Group de la App Tier, sin puertos abiertos a internet |
 | Carga masiva | 20,007 `usuarios` (MS1, `seed.py`), 20,009 `orders` (MS3, `seed.js`) y 20,000 `restaurantes` (MS2, `seed.js` en mongosh) |
-| API Gateway (HTTPS) | Expone `/ms1` ... `/ms5` hacia NGINX |
+| API Gateway (HTTPS) | Expone `/ms1` ... `/ms5` y llega al ALB interno por un **VPC Link** |
 | Frontend SPA (React + Vite) | AWS Amplify, consume el API Gateway por HTTPS |
 | MV de ingesta | EC2 dedicada `PP-Ingest-VM` (SG propio sin entradas, rol `LabInstanceProfile`). Ejecuta los 3 contenedores ETL por IP privada hacia la BD |
 | Data lake | 3 contenedores de ingesta -> S3 (snapshot completo, sin duplicados) -> Glue Crawler -> Athena (2 vistas). MS5 consulta Athena real (`ATHENA_MOCK=false`) |
 | Paginado | Opt-in en los listados grandes (`?page=&page_size=`), ver [00-mapa-conexiones.md](microservicios/00-mapa-conexiones.md) |
 | Swagger UI | Los 5 servicios, también a través de NGINX y API Gateway (`/ms1/docs`, `/ms2/swagger-ui.html`, `/ms3/api-docs`, `/ms4/docs`, `/ms5/docs`) |
 
-### Decisiones de arquitectura respecto al enunciado
+### Balanceo y decisiones de arquitectura
 
-- **Una sola EC2 de App** (en vez de dos): NGINX enruta por path a cada microservicio, pero no balancea carga entre dos VMs.
+Flujo: `Amplify (HTTPS) -> API Gateway -> VPC Link -> ALB interno -> NGINX (VM 1 o VM 2) -> microservicios -> DB Tier`. El ALB solo acepta tráfico del security group del VPC Link.
+Para comprobar el reparto: `for i in $(seq 1 20); do curl -sI https://<gateway>/ms1/health | grep -i x-served-by; done`. Si una VM cae, el ALB la saca de rotación en ~30 s y la otra atiende todo.
+
 - **Amplify por despliegue manual** (zip): no está conectado a GitHub para CI/CD.
-- **Postman:** [postman/delivery-cloud.postman_collection.json](postman/delivery-cloud.postman_collection.json) cubre los 5 microservicios (66 requests, 54 assertions). Contra local: `--env-var "base_url=http://localhost"`.
+- **Postman:** [postman/delivery-cloud.postman_collection.json](postman/delivery-cloud.postman_collection.json) cubre los 5 microservicios (71 requests, 65 assertions) y apunta por defecto al API Gateway HTTPS. Contra local: `--env-var "base_url=http://localhost"`.
 
 ## Estructura
 

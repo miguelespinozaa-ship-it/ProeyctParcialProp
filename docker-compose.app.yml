@@ -10,6 +10,7 @@ services:
   nginx:
     build: ./nginx
     container_name: nginx
+    hostname: ${NODE_NAME:-app-tier}
     restart: unless-stopped
     ports:
       - "80:80"

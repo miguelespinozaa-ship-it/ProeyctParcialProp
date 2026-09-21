@@ -249,6 +249,27 @@ function imgAjustada(s, ruta, x, y, wMax, hMax) {
   s.addNotes("Cada ejecución tiene un ID que se puede verificar en el historial de consultas de la consola de Athena. El gráfico muestra las unidades vendidas de la consulta 3.");
 }
 
+// 12b ─ Capturas de la consola de Athena
+{
+  const dirC = path.join(AQUI, "capturas-athena");
+  const orden = ["consulta-1.png", "consulta-2.png", "consulta-3.png", "consulta-4.png", "vista-1.png", "vista-2.png"];
+  const rot = { "consulta-1.png": "Consulta 1 · ventas por restaurante", "consulta-2.png": "Consulta 2 · clientes con mayor gasto", "consulta-3.png": "Consulta 3 · platos más vendidos",
+    "consulta-4.png": "Consulta 4 · ciudad vs. dirección de entrega", "vista-1.png": "Vista v_resumen_ventas_restaurante", "vista-2.png": "Vista v_metricas_usuarios" };
+  const hay = orden.filter((f) => fs.existsSync(path.join(dirC, f)));
+  if (hay.length) {
+    const s = claro();
+    titulo(s, "Evidencia en la consola de Athena", "Capturas de las consultas y vistas ejecutadas sobre el data lake");
+    const cols = hay.length <= 4 ? 2 : 3, w = cols === 2 ? 3.0 : 2.95, h = w * 1080 / 1920, gap = cols === 2 ? 0.3 : 0.12;
+    const x0 = (10 - (cols * w + (cols - 1) * gap)) / 2;
+    hay.forEach((f, i) => {
+      const x = x0 + (i % cols) * (w + gap), y = 1.4 + Math.floor(i / cols) * (h + 0.42);
+      s.addImage({ path: path.join(dirC, f), x, y, w, h, shadow: sombra() });
+      s.addText(rot[f], { x, y: y + h + 0.05, w, h: 0.28, fontFace: F, fontSize: 11, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    });
+    s.addNotes("Capturas reales de la consola de Amazon Athena con el workgroup pp-workgroup.");
+  }
+}
+
 // 13 ─ Paginado
 {
   const s = claro();

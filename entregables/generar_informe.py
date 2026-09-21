@@ -149,6 +149,17 @@ def fmt_num(x):
         return str(x)
 
 
+def captura_athena(nombre, ancho):
+    """Captura de la consola de Athena (si existe en entregables/capturas-athena)."""
+    ruta = os.path.join(AQUI, "capturas-athena", nombre)
+    if not os.path.exists(ruta):
+        return []
+    from PIL import Image as PI
+    w, h = PI.open(ruta).size
+    return [Spacer(1, 4), Image(ruta, width=ancho, height=ancho * h / w),
+            Paragraph("Captura de la consola de Amazon Athena (workgroup pp-workgroup).", S["leyenda"])]
+
+
 def bloque_consulta(num, titulo, desc, q):
     out = [P(f"Consulta {num} — {titulo}", "h2"), P(desc)]
     sql = q["sql"].strip()
@@ -160,6 +171,7 @@ def bloque_consulta(num, titulo, desc, q):
     ancho = 17.4 * cm / n
     out.append(tabla(filas, [ancho] * n))
     out.append(P(f"Athena: {q['id']} · {q['ms'] / 1000:.1f} s · {q['bytes'] / 1024:.0f} KB escaneados · primeras 6 filas de {len(q['rows'])} devueltas.", "peq"))
+    out += captura_athena(f"consulta-{num}.png", 17.4 * cm)
     return out
 
 
@@ -372,6 +384,7 @@ def construir(autores):
             filas = [v["header"]] + [[fmt_num(c) if re.fullmatch(r"-?\d+(\.\d+)?(E\d+)?", c or "") else c for c in r] for r in v["rows"][:6]]
             bl.append(tabla(filas, [W / len(v["header"])] * len(v["header"])))
             bl.append(P(f"CREATE VIEW: {v['create_id']} · SELECT: {v['id']} · {v['ms'] / 1000:.1f} s.", "peq"))
+            bl += captura_athena(f"vista-{1 if v['view'] == 'v_resumen_ventas_restaurante' else 2}.png", 17.4 * cm)
             E.append(KeepTogether(bl))
     else:
         E.append(P("Evidencia de Athena pendiente de ejecución (falta athena_evidence.json)."))

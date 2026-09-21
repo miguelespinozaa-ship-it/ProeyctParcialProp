@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="540" viewBox="0 0 1000 540">
+<defs><marker id="fl" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,5 L0,10 z" fill="context-stroke"/></marker></defs>
+<rect width="1000" height="540" fill="#FFFFFF"/>
+<text x="24.0" y="34.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">Diagrama Entidad-Relación — MS3 Pedidos · PostgreSQL 16 · base ms3_pedidos</text>
+<rect x="40" y="80" width="400" height="240" rx="6" fill="#FFFFFF" stroke="#3B48CC" stroke-width="1.8"/>
+<path d="M40,112 L40,86 Q40,80 46,80 L434,80 Q440,80 440,86 L440,112 Z" fill="#3B48CC"/>
+<text x="52.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" xml:space="preserve">orders</text>
+<text x="430.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#FFFFFF" text-anchor="end" xml:space="preserve">20,012 filas</text>
+<text x="50.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#B45F06" text-anchor="start" xml:space="preserve">PK</text>
+<text x="86.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">id</text>
+<text x="430.0" y="130.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">SERIAL</text>
+<rect x="41" y="138" width="398" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">customer_id</text>
+<text x="430.0" y="156.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INTEGER NOT NULL</text>
+<text x="50.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">restaurant_id</text>
+<text x="430.0" y="182.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(50) NOT NULL</text>
+<rect x="41" y="190" width="398" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">delivery_id</text>
+<text x="430.0" y="208.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INTEGER NULL</text>
+<text x="50.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">direccion_entrega</text>
+<text x="430.0" y="234.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">TEXT NOT NULL</text>
+<rect x="41" y="242" width="398" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">status</text>
+<text x="430.0" y="260.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(20) CHECK(3 estados)</text>
+<text x="50.0" y="286.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="286.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">total</text>
+<text x="430.0" y="286.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">NUMERIC(10,2) DEFAULT 0</text>
+<rect x="41" y="294" width="398" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="312.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="312.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">created_at</text>
+<text x="430.0" y="312.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">TIMESTAMP DEFAULT NOW()</text>
+<rect x="600" y="80" width="360" height="188" rx="6" fill="#FFFFFF" stroke="#3B48CC" stroke-width="1.8"/>
+<path d="M600,112 L600,86 Q600,80 606,80 L954,80 Q960,80 960,86 L960,112 Z" fill="#3B48CC"/>
+<text x="612.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" xml:space="preserve">order_items</text>
+<text x="950.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#FFFFFF" text-anchor="end" xml:space="preserve">26,566 filas</text>
+<text x="610.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#B45F06" text-anchor="start" xml:space="preserve">PK</text>
+<text x="646.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">id</text>
+<text x="950.0" y="130.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">SERIAL</text>
+<rect x="601" y="138" width="358" height="26" fill="#F6F7F9"/>
+<text x="610.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#1155CC" text-anchor="start" xml:space="preserve">FK</text>
+<text x="646.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">order_id</text>
+<text x="950.0" y="156.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INTEGER NOT NULL</text>
+<text x="610.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="646.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">dish_id</text>
+<text x="950.0" y="182.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(50) NOT NULL</text>
+<rect x="601" y="190" width="358" height="26" fill="#F6F7F9"/>
+<text x="610.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="646.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">nombre_plato</text>
+<text x="950.0" y="208.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(255) NOT NULL</text>
+<text x="610.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="646.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">cantidad</text>
+<text x="950.0" y="234.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INTEGER CHECK (&gt; 0)</text>
+<rect x="601" y="242" width="358" height="26" fill="#F6F7F9"/>
+<text x="610.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="646.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">precio_unitario</text>
+<text x="950.0" y="260.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">NUMERIC(10,2)</text>
+<path d="M440.0,125.0 L520.0,125.0 L520.0,151.0 L600.0,151.0" fill="none" stroke="#232F3E" stroke-width="1.8"/>
+<line x1="450.0" y1="118.0" x2="450.0" y2="132.0" stroke="#232F3E" stroke-width="2"/><line x1="456.0" y1="118.0" x2="456.0" y2="132.0" stroke="#232F3E" stroke-width="2"/>
+<line x1="584.0" y1="151.0" x2="600.0" y2="143.0" stroke="#232F3E" stroke-width="2"/><line x1="584.0" y1="151.0" x2="600.0" y2="151.0" stroke="#232F3E" stroke-width="2"/><line x1="584.0" y1="151.0" x2="600.0" y2="159.0" stroke="#232F3E" stroke-width="2"/>
+<rect x="497.1" y="105.5" width="45.8" height="20.9" fill="#FFFFFF" fill-opacity="0.92"/>
+<text x="520.0" y="117.5" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="middle" xml:space="preserve">1 : N</text>
+<text x="520.0" y="181.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#5F6B7A" text-anchor="middle" xml:space="preserve">ON DELETE CASCADE</text>
+<rect x="40" y="336" width="920" height="168" rx="8" fill="#FFFBE6" stroke="#D6B656" stroke-width="1.6"/>
+<text x="52.0" y="361.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">Reglas del modelo</text>
+<text x="52.0" y="377.9" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• Un pedido tiene de 1 a N ítems (orders 1 : N order_items). Al crearse, MS3 valida cada plato contra MS2 y guarda</text>
+<text x="52.0" y="394.8" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">  nombre y precio unitario como fotografía del momento de la compra.</text>
+<text x="52.0" y="411.7" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• status ∈ {PEDIDO, ENVIADO, ENTREGADO}: PEDIDO → ENVIADO (admin del restaurante) → ENTREGADO (repartidor asignado).</text>
+<text x="52.0" y="428.6" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• customer_id / delivery_id (MySQL) y restaurant_id (MongoDB) son referencias lógicas entre microservicios, sin FK.</text>
+<text x="52.0" y="445.5" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• Índices: idx_orders_customer, idx_orders_restaurant(restaurant_id, status), idx_orders_delivery, idx_order_items_order.</text>
+<text x="52.0" y="462.4" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• Carga masiva única con seed.js: 20,000+ pedidos con sus ítems.</text>
+</svg>

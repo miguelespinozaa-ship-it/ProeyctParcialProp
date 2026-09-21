@@ -1,0 +1,226 @@
+{
+ "usuarios": {
+  "columns": [
+   [
+    "id",
+    "bigint"
+   ],
+   [
+    "nombre",
+    "string"
+   ],
+   [
+    "email",
+    "string"
+   ],
+   [
+    "password_hash",
+    "string"
+   ],
+   [
+    "telefono",
+    "string"
+   ],
+   [
+    "rol",
+    "string"
+   ],
+   [
+    "restaurante_id",
+    "string"
+   ],
+   [
+    "fecha_registro",
+    "string"
+   ]
+  ],
+  "partitions": [
+   [
+    "dt",
+    "string"
+   ]
+  ],
+  "location": "s3://pp-ubereats-datalake-1789653444/raw/mysql/usuarios/",
+  "format": "csv"
+ },
+ "direcciones": {
+  "columns": [
+   [
+    "id",
+    "bigint"
+   ],
+   [
+    "usuario_id",
+    "bigint"
+   ],
+   [
+    "calle",
+    "string"
+   ],
+   [
+    "ciudad",
+    "string"
+   ],
+   [
+    "referencia",
+    "string"
+   ],
+   [
+    "lat",
+    "string"
+   ],
+   [
+    "lng",
+    "string"
+   ],
+   [
+    "es_principal",
+    "bigint"
+   ]
+  ],
+  "partitions": [
+   [
+    "dt",
+    "string"
+   ]
+  ],
+  "location": "s3://pp-ubereats-datalake-1789653444/raw/mysql/direcciones/",
+  "format": "csv"
+ },
+ "orders": {
+  "columns": [
+   [
+    "id",
+    "bigint"
+   ],
+   [
+    "customer_id",
+    "bigint"
+   ],
+   [
+    "restaurant_id",
+    "string"
+   ],
+   [
+    "delivery_id",
+    "double"
+   ],
+   [
+    "direccion_entrega",
+    "string"
+   ],
+   [
+    "status",
+    "string"
+   ],
+   [
+    "total",
+    "double"
+   ],
+   [
+    "created_at",
+    "string"
+   ]
+  ],
+  "partitions": [
+   [
+    "dt",
+    "string"
+   ]
+  ],
+  "location": "s3://pp-ubereats-datalake-1789653444/raw/postgres/orders/",
+  "format": "csv"
+ },
+ "order_items": {
+  "columns": [
+   [
+    "id",
+    "bigint"
+   ],
+   [
+    "order_id",
+    "bigint"
+   ],
+   [
+    "dish_id",
+    "string"
+   ],
+   [
+    "nombre_plato",
+    "string"
+   ],
+   [
+    "cantidad",
+    "bigint"
+   ],
+   [
+    "precio_unitario",
+    "double"
+   ]
+  ],
+  "partitions": [
+   [
+    "dt",
+    "string"
+   ]
+  ],
+  "location": "s3://pp-ubereats-datalake-1789653444/raw/postgres/order_items/",
+  "format": "csv"
+ },
+ "mongodb": {
+  "columns": [
+   [
+    "_id",
+    "struct<$oid:string>"
+   ],
+   [
+    "nombre",
+    "string"
+   ],
+   [
+    "categoria",
+    "string"
+   ],
+   [
+    "ciudad",
+    "string"
+   ],
+   [
+    "direccion",
+    "string"
+   ],
+   [
+    "admin_id",
+    "int"
+   ],
+   [
+    "calificacion_promedio",
+    "double"
+   ],
+   [
+    "platos",
+    "array<struct<id:string,nombre:string,descripcion:string,precio:double,categoria:string,disponible:boolean>>"
+   ],
+   [
+    "resenas",
+    "array<struct<usuario_id:int,comentario:string,puntuacion:int,fecha:struct<$date:string>>>"
+   ],
+   [
+    "_class",
+    "string"
+   ]
+  ],
+  "partitions": [
+   [
+    "partition_0",
+    "string"
+   ],
+   [
+    "dt",
+    "string"
+   ]
+  ],
+  "location": "s3://pp-ubereats-datalake-1789653444/raw/mongodb/",
+  "format": "json"
+ }
+}

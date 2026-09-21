@@ -89,12 +89,17 @@ db/                          scripts de inicialización de esquema por BD
 data-science/                pipeline ETL a S3 + SQL de Athena (queries_and_views.sql)
 frontend/                    SPA React (Vite)
 postman/                     colección de Postman
-infra/diagramas/             diagramas draw.io (pendiente)
+infra/diagramas/             diagramas (draw.io editable + PNG/SVG) y su generador
+entregables/                 informe técnico (PDF), presentación (PPTX), capturas y evidencia de Athena
+amplify.yml                  build de AWS Amplify para el frontend (CI/CD desde GitHub)
 ```
 
-## Próximos pasos (Fase 12)
+## Entregables
 
-- Diagrama de arquitectura en draw.io (`infra/diagramas/`).
-- Diagrama ER del catálogo de Glue.
-- Evidencia de Athena (4 consultas con JOIN + 2 vistas) para el informe.
-- Informe técnico (PDF) y presentación (PowerPoint).
+- **Diagramas:** [infra/diagramas/](infra/diagramas/) — `proyecto-delivery-cloud.drawio` (5 páginas: arquitectura, E/R de MySQL, E/R de PostgreSQL, JSON de MongoDB, E/R del catálogo de Glue) y sus PNG/SVG. Se regeneran con `python3 infra/diagramas/generar_diagramas.py`.
+- **Informe técnico (PDF) y presentación (PowerPoint):** [entregables/](entregables/), con `generar_informe.py` y `generar_presentacion.js`.
+- **Evidencia de Athena:** `entregables/athena_evidence.json` (4 consultas con JOIN y 2 vistas, con el ID de ejecución de cada una).
+
+## CI/CD del frontend (AWS Amplify)
+
+[amplify.yml](amplify.yml) compila la SPA de `frontend/` (`npm ci` + `npm run build`) y usa por defecto el API Gateway del proyecto (`VITE_API_BASE_URL` puede sobreescribirse en Amplify). Para desplegar en cada `git push` a `main`: Amplify → *Create new app* → *GitHub* → autorizar → repositorio `ProeyctParcialProp`, rama `main` (marcar *monorepo* con carpeta `frontend`) → agregar la regla de reescritura `/<*>` → `/index.html` (200).

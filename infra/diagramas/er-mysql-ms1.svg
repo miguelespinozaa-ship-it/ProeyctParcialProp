@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="520" viewBox="0 0 1000 520">
+<defs><marker id="fl" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,5 L0,10 z" fill="context-stroke"/></marker></defs>
+<rect width="1000" height="520" fill="#FFFFFF"/>
+<text x="24.0" y="34.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">Diagrama Entidad-Relación — MS1 Usuarios/Auth · MySQL 8.0 · base ms1_usuarios</text>
+<rect x="40" y="80" width="380" height="240" rx="6" fill="#FFFFFF" stroke="#3B48CC" stroke-width="1.8"/>
+<path d="M40,112 L40,86 Q40,80 46,80 L414,80 Q420,80 420,86 L420,112 Z" fill="#3B48CC"/>
+<text x="52.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" xml:space="preserve">usuarios</text>
+<text x="410.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#FFFFFF" text-anchor="end" xml:space="preserve">20,009 filas</text>
+<text x="50.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#B45F06" text-anchor="start" xml:space="preserve">PK</text>
+<text x="86.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">id</text>
+<text x="410.0" y="130.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INT AUTO_INCREMENT</text>
+<rect x="41" y="138" width="378" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">nombre</text>
+<text x="410.0" y="156.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(150) NOT NULL</text>
+<text x="50.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#674EA7" text-anchor="start" xml:space="preserve">UQ</text>
+<text x="86.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">email</text>
+<text x="410.0" y="182.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(150) NOT NULL</text>
+<rect x="41" y="190" width="378" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">password_hash</text>
+<text x="410.0" y="208.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(255) NOT NULL</text>
+<text x="50.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">telefono</text>
+<text x="410.0" y="234.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(30) NULL</text>
+<rect x="41" y="242" width="378" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">rol</text>
+<text x="410.0" y="260.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">ENUM(customer,delivery,admin)</text>
+<text x="50.0" y="286.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="286.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">restaurante_id</text>
+<text x="410.0" y="286.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(50) NULL</text>
+<rect x="41" y="294" width="378" height="26" fill="#F6F7F9"/>
+<text x="50.0" y="312.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="86.0" y="312.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">fecha_registro</text>
+<text x="410.0" y="312.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">DATETIME DEFAULT NOW()</text>
+<rect x="580" y="80" width="380" height="240" rx="6" fill="#FFFFFF" stroke="#3B48CC" stroke-width="1.8"/>
+<path d="M580,112 L580,86 Q580,80 586,80 L954,80 Q960,80 960,86 L960,112 Z" fill="#3B48CC"/>
+<text x="592.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start" xml:space="preserve">direcciones</text>
+<text x="950.0" y="101.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#FFFFFF" text-anchor="end" xml:space="preserve">17,025 filas</text>
+<text x="590.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#B45F06" text-anchor="start" xml:space="preserve">PK</text>
+<text x="626.0" y="130.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">id</text>
+<text x="950.0" y="130.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INT AUTO_INCREMENT</text>
+<rect x="581" y="138" width="378" height="26" fill="#F6F7F9"/>
+<text x="590.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#1155CC" text-anchor="start" xml:space="preserve">FK</text>
+<text x="626.0" y="156.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">usuario_id</text>
+<text x="950.0" y="156.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">INT NOT NULL</text>
+<text x="590.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="626.0" y="182.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">calle</text>
+<text x="950.0" y="182.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(255) NOT NULL</text>
+<rect x="581" y="190" width="378" height="26" fill="#F6F7F9"/>
+<text x="590.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="626.0" y="208.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">ciudad</text>
+<text x="950.0" y="208.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(100) NOT NULL</text>
+<text x="590.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="626.0" y="234.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">referencia</text>
+<text x="950.0" y="234.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">VARCHAR(255) NULL</text>
+<rect x="581" y="242" width="378" height="26" fill="#F6F7F9"/>
+<text x="590.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="626.0" y="260.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">lat</text>
+<text x="950.0" y="260.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">DECIMAL(10,7) NULL</text>
+<text x="590.0" y="286.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="626.0" y="286.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">lng</text>
+<text x="950.0" y="286.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">DECIMAL(10,7) NULL</text>
+<rect x="581" y="294" width="378" height="26" fill="#F6F7F9"/>
+<text x="590.0" y="312.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#5F6B7A" text-anchor="start" xml:space="preserve"></text>
+<text x="626.0" y="312.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">es_principal</text>
+<text x="950.0" y="312.0" font-family="DejaVu Sans Mono, Courier New, monospace" font-size="12" font-weight="400" fill="#5F6B7A" text-anchor="end" xml:space="preserve">TINYINT(1) DEFAULT 0</text>
+<path d="M420.0,125.0 L500.0,125.0 L500.0,151.0 L580.0,151.0" fill="none" stroke="#232F3E" stroke-width="1.8"/>
+<line x1="430.0" y1="118.0" x2="430.0" y2="132.0" stroke="#232F3E" stroke-width="2"/><line x1="436.0" y1="118.0" x2="436.0" y2="132.0" stroke="#232F3E" stroke-width="2"/>
+<line x1="564.0" y1="151.0" x2="580.0" y2="143.0" stroke="#232F3E" stroke-width="2"/><line x1="564.0" y1="151.0" x2="580.0" y2="151.0" stroke="#232F3E" stroke-width="2"/><line x1="564.0" y1="151.0" x2="580.0" y2="159.0" stroke="#232F3E" stroke-width="2"/>
+<rect x="477.1" y="105.5" width="45.8" height="20.9" fill="#FFFFFF" fill-opacity="0.92"/>
+<text x="500.0" y="117.5" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="middle" xml:space="preserve">1 : N</text>
+<text x="500.0" y="181.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="11" font-weight="400" fill="#5F6B7A" text-anchor="middle" xml:space="preserve">ON DELETE CASCADE</text>
+<rect x="40" y="372" width="920" height="118" rx="8" fill="#FFFBE6" stroke="#D6B656" stroke-width="1.6"/>
+<text x="52.0" y="397.0" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#232F3E" text-anchor="start" xml:space="preserve">Reglas del modelo</text>
+<text x="52.0" y="413.9" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• Un usuario tiene de 0 a N direcciones (usuarios 1 : N direcciones); la FK usuario_id elimina en cascada.</text>
+<text x="52.0" y="430.8" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• email es único; rol restringe a customer, delivery o admin. restaurante_id solo lo usa el admin y es una referencia</text>
+<text x="52.0" y="447.7" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">  lógica al _id del restaurante en MongoDB (no hay FK entre motores).</text>
+<text x="52.0" y="464.6" font-family="Liberation Sans, Arial, Helvetica, sans-serif" font-size="13" font-weight="400" fill="#232F3E" text-anchor="start" xml:space="preserve">• Carga masiva única con seed.py (Faker): 20,000+ usuarios. Índices: idx_usuarios_rol, idx_direcciones_usuario.</text>
+</svg>

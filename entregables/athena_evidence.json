@@ -1,0 +1,345 @@
+{
+ "queries": [
+  {
+   "id": "6568912e-2abe-4bf4-8e09-ba40eaf7c46c",
+   "sql": "SELECT\n    r.nombre AS restaurante,\n    COUNT(DISTINCT o.id) AS num_pedidos,\n    SUM(oi.cantidad * oi.precio_unitario) AS total_ventas\nFROM orders o\nJOIN order_items oi ON oi.order_id = o.id\nJOIN mongodb r ON r._id.\"$oid\" = o.restaurant_id\nGROUP BY r.nombre\nORDER BY total_ventas DESC;",
+   "header": [
+    "restaurante",
+    "num_pedidos",
+    "total_ventas"
+   ],
+   "rows": [
+    [
+     "Sabor Criollo",
+     "9898",
+     "997825.6999999991"
+    ],
+    [
+     "Pizza Bella",
+     "10111",
+     "806688.0"
+    ]
+   ],
+   "ms": 2522,
+   "bytes": 26486870,
+   "submitted": "2026-09-21T07:43:42.958000-05:00"
+  },
+  {
+   "id": "890bb508-1f76-4302-aa35-5b2d1be5a66f",
+   "sql": "SELECT\n    u.nombre AS cliente,\n    u.email,\n    COUNT(o.id) AS num_pedidos,\n    SUM(o.total) AS gasto_total\nFROM orders o\nJOIN usuarios u ON u.id = o.customer_id\nGROUP BY u.nombre, u.email\nORDER BY gasto_total DESC\nLIMIT 50;",
+   "header": [
+    "cliente",
+    "email",
+    "num_pedidos",
+    "gasto_total"
+   ],
+   "rows": [
+    [
+     "Lucía Esteban Meraz Olivárez",
+     "user19878_nadiasolano@demo.com",
+     "9",
+     "870.8"
+    ],
+    [
+     "Pedro Niño Cortés",
+     "user8656_villasenormaria-cristina@demo.com",
+     "6",
+     "731.3"
+    ],
+    [
+     "José Carlos Gabriel Montez",
+     "user6641_jacobo81@demo.com",
+     "6",
+     "730.4000000000001"
+    ],
+    [
+     "Eugenio Botello",
+     "user14013_cjaramillo@demo.com",
+     "8",
+     "700.4"
+    ],
+    [
+     "Adán Sandoval Bueno",
+     "user18511_arellanodelia@demo.com",
+     "5",
+     "672.6"
+    ],
+    [
+     "Gabriela Inés Vega Apodaca",
+     "user19231_rolandogarica@demo.com",
+     "6",
+     "671.8"
+    ],
+    [
+     "Citlali Mejía Orosco",
+     "user7701_aldonzabermudez@demo.com",
+     "5",
+     "669.9"
+    ],
+    [
+     "Olga Enrique Longoria",
+     "user14241_leonardoayala@demo.com",
+     "5",
+     "655.1"
+    ],
+    [
+     "Eva Rojas",
+     "user7447_castillosusana@demo.com",
+     "5",
+     "635.1999999999999"
+    ],
+    [
+     "Gloria Balderas",
+     "user14084_tduarte@demo.com",
+     "5",
+     "634.5"
+    ]
+   ],
+   "ms": 1465,
+   "bytes": 5250883,
+   "submitted": "2026-09-21T07:43:48.632000-05:00"
+  },
+  {
+   "id": "8b7213e4-57ce-4689-b348-92fc12f912b8",
+   "sql": "SELECT\n    r.nombre AS restaurante,\n    oi.nombre_plato,\n    SUM(oi.cantidad) AS unidades_vendidas\nFROM order_items oi\nJOIN orders o ON o.id = oi.order_id\nJOIN mongodb r ON r._id.\"$oid\" = o.restaurant_id\nGROUP BY r.nombre, oi.nombre_plato\nORDER BY unidades_vendidas DESC\nLIMIT 50;",
+   "header": [
+    "restaurante",
+    "nombre_plato",
+    "unidades_vendidas"
+   ],
+   "rows": [
+    [
+     "Pizza Bella",
+     "Pizza Margarita",
+     "25209"
+    ],
+    [
+     "Sabor Criollo",
+     "Ají de Gallina",
+     "20640"
+    ],
+    [
+     "Sabor Criollo",
+     "Lomo Saltado",
+     "20593"
+    ],
+    [
+     "Sabor Criollo",
+     "ala",
+     "1"
+    ]
+   ],
+   "ms": 2126,
+   "bytes": 26486870,
+   "submitted": "2026-09-21T07:43:54.145000-05:00"
+  },
+  {
+   "id": "45f534a4-801f-4c86-a337-0863286fc75a",
+   "sql": "SELECT\n    u.nombre AS cliente,\n    d.ciudad AS ciudad_registrada,\n    o.direccion_entrega,\n    COUNT(o.id) AS num_pedidos\nFROM orders o\nJOIN usuarios u ON u.id = o.customer_id\nLEFT JOIN direcciones d ON d.usuario_id = u.id AND d.es_principal = 1\nGROUP BY u.nombre, d.ciudad, o.direccion_entrega\nORDER BY num_pedidos DESC\nLIMIT 50;",
+   "header": [
+    "cliente",
+    "ciudad_registrada",
+    "direccion_entrega",
+    "num_pedidos"
+   ],
+   "rows": [
+    [
+     "Cliente Demo",
+     "Lima",
+     "793 Gleason Cape",
+     "2"
+    ],
+    [
+     "Cliente Demo",
+     "Lima",
+     "Av. Postman 1",
+     "2"
+    ],
+    [
+     "Mario Matías Zamora",
+     "San Clara los altos",
+     "15778 Friesen Knolls",
+     "1"
+    ],
+    [
+     "Jaime Marisol Soliz Pedroza",
+     "",
+     "6417 Court Street",
+     "1"
+    ],
+    [
+     "Mtro. Rafaél Henríquez",
+     "Vieja Omán",
+     "5437 Kuhlman Coves",
+     "1"
+    ],
+    [
+     "Dr. Abigail Olvera",
+     "",
+     "1236 Field Lane",
+     "1"
+    ],
+    [
+     "Carmen Covarrubias",
+     "",
+     "83180 Hazel Close",
+     "1"
+    ],
+    [
+     "Lic. Guillermina Fajardo",
+     "",
+     "8596 Feil Well",
+     "1"
+    ],
+    [
+     "Martha Castro Mares",
+     "Nueva Bhután",
+     "727 Lemke Circles",
+     "1"
+    ],
+    [
+     "Ing. Olga Chavarría",
+     "Nueva Cuba",
+     "39146 Shanny Trail",
+     "1"
+    ]
+   ],
+   "ms": 1805,
+   "bytes": 6964785,
+   "submitted": "2026-09-21T07:43:59.674000-05:00"
+  }
+ ],
+ "views": [
+  {
+   "id": "4aedf6fe-5bcc-43d7-86e5-106e51f5a3c8",
+   "sql": "SELECT * FROM v_resumen_ventas_restaurante ORDER BY total_ventas DESC LIMIT 10",
+   "header": [
+    "restaurante_id",
+    "nombre",
+    "num_pedidos",
+    "total_ventas",
+    "calificacion_promedio"
+   ],
+   "rows": [
+    [
+     "6aaf439f1bd3c2380450f532",
+     "Sabor Criollo",
+     "9898",
+     "997825.7000000014",
+     "5.0"
+    ],
+    [
+     "6aaf439f1bd3c2380450f533",
+     "Pizza Bella",
+     "10111",
+     "806688.0",
+     "4.2"
+    ]
+   ],
+   "ms": 2166,
+   "bytes": 26486870,
+   "submitted": "2026-09-21T07:44:08.243000-05:00",
+   "view": "v_resumen_ventas_restaurante",
+   "create_id": "ac099df1-4664-43b3-98d6-750b933e0c1c",
+   "create_sql": "CREATE OR REPLACE VIEW v_resumen_ventas_restaurante AS\nSELECT\n    r._id.\"$oid\" AS restaurante_id,\n    r.nombre,\n    COUNT(DISTINCT o.id) AS num_pedidos,\n    SUM(oi.cantidad * oi.precio_unitario) AS total_ventas,\n    r.calificacion_promedio\nFROM orders o\nJOIN order_items oi ON oi.order_id = o.id\nJOIN mongodb r ON r._id.\"$oid\" = o.restaurant_id\nGROUP BY r._id.\"$oid\", r.nombre, r.calificacion_promedio;"
+  },
+  {
+   "id": "8f42b3a6-307a-4c46-8e36-f795d3f5293a",
+   "sql": "SELECT * FROM v_metricas_usuarios ORDER BY 1 LIMIT 10",
+   "header": [
+    "usuario_id",
+    "nombre",
+    "num_pedidos",
+    "gasto_promedio",
+    "antiguedad_cuenta"
+   ],
+   "rows": [
+    [
+     "1",
+     "Cliente Demo",
+     "2",
+     "122.69999999999999",
+     "0-30 dias"
+    ],
+    [
+     "2",
+     "Repartidor Demo",
+     "0",
+     "0.0",
+     "0-30 dias"
+    ],
+    [
+     "3",
+     "Admin Demo",
+     "0",
+     "0.0",
+     "0-30 dias"
+    ],
+    [
+     "4",
+     "Lic. Laura Valverde",
+     "2",
+     "128.8",
+     "0-30 dias"
+    ],
+    [
+     "5",
+     "Mauro Yuridia Orellana",
+     "2",
+     "37.15",
+     "0-30 dias"
+    ],
+    [
+     "6",
+     "Mauro Prieto Olivas",
+     "0",
+     "0.0",
+     "0-30 dias"
+    ],
+    [
+     "7",
+     "Pascual Ramón Puente Anguiano",
+     "1",
+     "128.0",
+     "0-30 dias"
+    ],
+    [
+     "8",
+     "Ana Luisa Rocha Bermúdez",
+     "3",
+     "97.66666666666667",
+     "0-30 dias"
+    ],
+    [
+     "9",
+     "Gustavo Cristal Arroyo",
+     "2",
+     "77.35",
+     "0-30 dias"
+    ],
+    [
+     "10",
+     "Teodoro Mota Romero",
+     "1",
+     "122.7",
+     "0-30 dias"
+    ]
+   ],
+   "ms": 1967,
+   "bytes": 5250883,
+   "submitted": "2026-09-21T07:44:16.882000-05:00",
+   "view": "v_metricas_usuarios",
+   "create_id": "13e4a748-b0ae-477a-ab76-4d5faa49c729",
+   "create_sql": "CREATE OR REPLACE VIEW v_metricas_usuarios AS\nSELECT\n    u.id AS usuario_id,\n    u.nombre,\n    COUNT(o.id) AS num_pedidos,\n    COALESCE(AVG(o.total), 0) AS gasto_promedio,\n    CASE\n        WHEN date_diff('day', date(substr(u.fecha_registro, 1, 10)), current_date) < 30 THEN '0-30 dias'\n        WHEN date_diff('day', date(substr(u.fecha_registro, 1, 10)), current_date) < 90 THEN '31-90 dias'\n        ELSE '90+ dias'\n    END AS antiguedad_cuenta\nFROM usuarios u\nLEFT JOIN orders o ON o.customer_id = u.id\nGROUP BY u.id, u.nombre, u.fecha_registro;"
+  }
+ ],
+ "counts": {
+  "usuarios": "20007",
+  "direcciones": "17025",
+  "orders": "20009",
+  "order_items": "26566",
+  "mongodb": "20000",
+  "v_metricas_usuarios": "20007",
+  "v_resumen_ventas_restaurante": "2"
+ }
+}

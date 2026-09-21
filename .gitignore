@@ -34,3 +34,7 @@ target/
 
 # Material del curso (no redistribuir)
 *.pdf
+
+# Excepcion: el informe tecnico es un entregable (los PDF del curso siguen excluidos)
+!entregables/*.pdf
+.~lock.*

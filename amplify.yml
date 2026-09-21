@@ -1,0 +1,21 @@
+# Build de AWS Amplify para el monorepo: solo compila la SPA de la carpeta frontend/.
+# VITE_API_BASE_URL puede definirse en Amplify > Variables de entorno; si no, usa el API Gateway del proyecto.
+version: 1
+applications:
+  - appRoot: frontend
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - export VITE_API_BASE_URL="${VITE_API_BASE_URL:-https://jt3z0elcud.execute-api.us-east-1.amazonaws.com}"
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*

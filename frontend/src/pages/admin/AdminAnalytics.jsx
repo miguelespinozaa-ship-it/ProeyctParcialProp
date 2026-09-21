@@ -5,6 +5,8 @@ import Pagination from "../../components/Pagination";
 
 const METRICS_PAGE_SIZE = 10;
 
+const soles = (n) => `S/ ${Number(n).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 export default function AdminAnalytics() {
   const [restaurants, setRestaurants] = useState([]);
   const [metrics, setMetrics] = useState(null);
@@ -42,7 +44,7 @@ export default function AdminAnalytics() {
             {restaurants.map((r) => (
               <tr key={r.restaurante_id}>
                 <td>{r.nombre}</td>
-                <td>S/ {r.total_ventas}</td>
+                <td>{soles(r.total_ventas)}</td>
                 <td>{r.num_pedidos}</td>
                 <td>{r.calificacion_promedio}</td>
               </tr>
@@ -65,7 +67,7 @@ export default function AdminAnalytics() {
               <tr key={u.usuario_id}>
                 <td>{u.nombre}</td>
                 <td>{u.num_pedidos}</td>
-                <td>S/ {u.gasto_promedio}</td>
+                <td>{soles(u.gasto_promedio)}</td>
                 <td>{u.antiguedad_cuenta}</td>
               </tr>
             ))}

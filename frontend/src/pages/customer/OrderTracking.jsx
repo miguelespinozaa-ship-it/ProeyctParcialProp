@@ -36,7 +36,7 @@ export default function OrderTracking() {
         </p>
 
         <h3>Repartidor</h3>
-        <p>{tracking.repartidor ? `${tracking.repartidor.nombre} — ${tracking.repartidor.telefono}` : "Todavía no asignado"}</p>
+        <p>{tracking.repartidor ? [tracking.repartidor.nombre, tracking.repartidor.telefono].filter(Boolean).join(" — ") : "Todavía no asignado"}</p>
 
         <h3>Items</h3>
         <ul>

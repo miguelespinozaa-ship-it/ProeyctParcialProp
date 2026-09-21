@@ -1119,6 +1119,46 @@
           }
         },
         {
+          "name": "Tracking (customer dueño ve el nombre del repartidor, sin teléfono)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_customer}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ms4/api/v1/tracking/order/{{order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ms4",
+                "api",
+                "v1",
+                "tracking",
+                "order",
+                "{{order_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"el customer dueño ve al repartidor por nombre\", () => { pm.expect(j.repartidor).to.be.an(\"object\"); pm.expect(j.repartidor.nombre).to.be.a(\"string\").and.not.empty; });",
+                  "pm.test(\"sin exponer el teléfono del repartidor\", () => pm.expect(j.repartidor.telefono).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Dashboard customer",
           "request": {
             "method": "GET",

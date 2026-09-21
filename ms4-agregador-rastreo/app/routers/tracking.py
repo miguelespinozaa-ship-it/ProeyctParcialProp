@@ -41,8 +41,15 @@ async def track_order(order_id: int, authorization: Optional[str] = Header(None)
     repartidor = None
     if order.get("delivery_id"):
         try:
-            d = await ms1_client.get_user(order["delivery_id"], auth_header=authorization)
-            repartidor = {"nombre": d.get("nombre"), "telefono": d.get("telefono")}
+            try:
+                d = await ms1_client.get_user(order["delivery_id"], auth_header=authorization)
+            except httpx.HTTPStatusError as exc:
+                # El cliente no puede leer perfiles ajenos: mostrar solo el nombre del repartidor.
+                if exc.response.status_code not in (401, 403):
+                    raise
+                d = await ms1_client.get_user_public(order["delivery_id"])
+            if d:
+                repartidor = {"nombre": d.get("nombre"), "telefono": d.get("telefono")}
         except httpx.HTTPError:
             pass
 

@@ -1,87 +1,79 @@
-# MS3 — Pedidos (Orders)
+# MS3 — Pedidos
 
-**Stack:** Node.js (Express) + PostgreSQL 16
-**Puerto:** `8083`
-**Base path:** `/api/v1`
-**Responsable:** Integrante 1
-**Docs:** Swagger UI en `/api-docs`
+**Stack:** Node.js 20 (Express) + `pg`
+**Puerto:** `8083` · **Base path:** `/api/v1` · **Docs:** `/api-docs` (Swagger, spec manual en `src/openapi.json`)
+**Código:** [`ms3-pedidos/`](../ms3-pedidos/)
+**En AWS:** `https://<api-gateway>/ms3/...`
 
-## Flujo de estados
+## Qué resuelve
 
-```
-PEDIDO ──(admin prepara)──> ENVIADO ──(delivery entrega)──> ENTREGADO
-```
+El corazón transaccional: crea pedidos, valida cada plato contra MS2, resuelve nombres contra MS1, y controla la máquina de estados `PEDIDO → ENVIADO → ENTREGADO`. Es el único microservicio con dos tablas relacionadas por FK real (dentro de su propia base).
 
-- **customer**: arma carrito (client-side) → `POST /orders` crea pedido en estado `PEDIDO`.
-- **admin** (dueño del restaurante del pedido): cambia `PEDIDO → ENVIADO` cuando el pedido está listo para recoger.
-- **delivery**: "jala" (claim) un pedido en estado `ENVIADO` sin repartidor asignado → luego marca `ENVIADO → ENTREGADO` al llegar.
-
-## Modelo de datos (PostgreSQL)
+## Modelo de datos (PostgreSQL 16, base `ms3_pedidos`)
 
 ```
-orders (1) ──< (N) order_items
+orders (1) ──< (N) order_items      ON DELETE CASCADE
 ```
 
-**orders**
-| campo | tipo | notas |
+**`orders`**
+| Campo | Tipo | Notas |
 |---|---|---|
-| id | SERIAL PK | |
-| customer_id | INT | FK lógica → MS1.usuarios (rol customer) |
-| restaurant_id | VARCHAR | FK lógica → MS2 (ObjectId) |
-| delivery_id | INT NULL | FK lógica → MS1.usuarios (rol delivery), null hasta que se "jala" |
-| direccion_entrega | TEXT | |
-| status | VARCHAR | `PEDIDO` \| `ENVIADO` \| `ENTREGADO` |
-| total | NUMERIC(10,2) | |
-| created_at | TIMESTAMP | |
+| `id` | SERIAL PK | |
+| `customer_id` | INTEGER | referencia lógica a `usuarios.id` (MS1) |
+| `restaurant_id` | VARCHAR(50) | referencia lógica al `_id` de MongoDB (MS2) |
+| `delivery_id` | INTEGER NULL | se llena al hacer `claim` |
+| `direccion_entrega` | TEXT | |
+| `status` | VARCHAR(20) | `CHECK IN ('PEDIDO','ENVIADO','ENTREGADO')` |
+| `total` | NUMERIC(10,2) | suma de `cantidad × precio_unitario` |
+| `created_at` | TIMESTAMP | `DEFAULT NOW()` |
 
-**order_items**
-| campo | tipo | notas |
+**`order_items`**
+| Campo | Tipo | Notas |
 |---|---|---|
-| id | SERIAL PK | |
-| order_id | INT FK → orders.id | |
-| dish_id | VARCHAR | FK lógica → MS2 |
-| nombre_plato | VARCHAR | snapshot al momento del pedido |
-| cantidad | INT | |
-| precio_unitario | NUMERIC(10,2) | snapshot (validado contra MS2 al crear) |
+| `id` | SERIAL PK | |
+| `order_id` | INTEGER FK → `orders.id` | `ON DELETE CASCADE` |
+| `dish_id`, `nombre_plato` | VARCHAR | fotografía del plato al momento de comprar (no se recalcula si el admin cambia el precio después) |
+| `cantidad` | INTEGER | `CHECK (> 0)` |
+| `precio_unitario` | NUMERIC(10,2) | |
 
-Carga masiva: `seed.js` → ≥20,000 registros en `orders`.
+Índices: `idx_orders_customer`, `idx_orders_restaurant(restaurant_id,status)`, `idx_orders_delivery`, `idx_order_items_order`. Carga masiva única: `seed.js` → 20,009 pedidos, 26,566 ítems.
 
-> El **carrito** vive en el frontend (estado local, no persiste en backend). Al dar "hacer pedido" se llama `POST /api/v1/orders` con todos los items acumulados.
+## Máquina de estados
+
+```
+PEDIDO ──(admin dueño del restaurante)──> ENVIADO ──(delivery hace claim, luego deliver)──> ENTREGADO
+```
+
+- `claim` solo funciona sobre un pedido `ENVIADO` con `delivery_id IS NULL`; es una operación atómica en SQL, así que si dos repartidores lo intentan a la vez solo uno gana (el otro recibe `409`).
+- `deliver` solo lo puede ejecutar el mismo repartidor que hizo el `claim`.
 
 ## Endpoints
 
-### Customer
-| Método | Ruta | Descripción |
-|---|---|---|
-| POST | `/api/v1/orders` | Crea pedido desde el carrito — valida cada `dish_id`/precio contra **MS2**, status inicial `PEDIDO` |
-| GET | `/api/v1/orders/{order_id}` | Detalle de pedido + items |
-| GET | `/api/v1/orders?customer_id={id}` | Historial de pedidos del customer |
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| POST | `/api/v1/orders` | JWT customer | Crea pedido. Por cada ítem llama a MS2 (`GET .../menu/{dishId}`) para validar precio/disponibilidad; `400` si un plato no existe. |
+| GET | `/api/v1/orders?customer_id=&restaurant_id=&delivery_id=&status=&include_items=&page=&page_size=` | no* | Listado con filtros. Paginado opcional (ver abajo). `include_items=true` trae los platos de cada pedido de la página en una sola query extra. |
+| GET | `/api/v1/orders/summary?restaurant_id=&customer_id=&delivery_id=` | no* | Conteo `{PEDIDO,ENVIADO,ENTREGADO,total}` sin traer filas — lo usan los tabs del admin. |
+| GET | `/api/v1/orders/{orderId}` | no* | Detalle + ítems. |
+| PUT | `/api/v1/orders/{orderId}/status` | JWT admin dueño | `PEDIDO → ENVIADO`. `403` si el restaurante no es del admin del token. |
+| PUT | `/api/v1/orders/{orderId}/claim` | JWT delivery | Asigna el pedido al repartidor. `409` si ya no está disponible. |
+| PUT | `/api/v1/orders/{orderId}/deliver` | JWT delivery (mismo que hizo claim) | `ENVIADO → ENTREGADO`. |
+| GET | `/api/v1/orders/available?page=&page_size=` | JWT delivery | Pool de pedidos `ENVIADO` sin asignar, orden FIFO. |
+| GET | `/api/v1/restaurants/{restaurantId}/customers?page=&page_size=` | no | Clientes distintos de un restaurante, con nombre resuelto vía MS1 (lookup en lote de hasta 200 ids, 5 en paralelo). |
 
-### Admin (restaurante)
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/v1/orders?restaurant_id={id}&status=` | Pedidos del restaurante del admin (filtrable por estado) |
-| PUT | `/api/v1/orders/{order_id}/status` | Cambia `PEDIDO → ENVIADO` (solo admin dueño del restaurante del pedido) |
-| GET | `/api/v1/restaurants/{restaurant_id}/customers` | Clientes distintos que han pedido en ese restaurante (join interno con MS1 vía `GET /users?rol=customer&ids=`) |
+*Sin JWT obligatorio porque los consume MS4 internamente (red privada); la autorización de escritura sí es estricta.
 
-### Delivery
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/v1/orders/available` | Pedidos en estado `ENVIADO` con `delivery_id` nulo (para "jalar") |
-| PUT | `/api/v1/orders/{order_id}/claim` | Delivery jala el pedido — asigna `delivery_id` (requiere `status=ENVIADO` y `delivery_id` null) |
-| PUT | `/api/v1/orders/{order_id}/deliver` | Delivery marca `ENVIADO → ENTREGADO` (requiere `delivery_id == self`) |
-| GET | `/api/v1/orders?delivery_id={id}` | Pedidos asignados/entregados por ese repartidor |
+**Paginado:** sin `page`/`page_size`, arreglo completo (`X-Total-Count` en la cabecera); con ellos, `{items,page,page_size,total,total_pages}` (máx. 100, `400` si son inválidos, página fuera de rango → `items` vacío).
 
-### Infra
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/health` | Healthcheck |
-| GET | `/api-docs` | Swagger UI |
+## Seguridad
+Mismo JWT HS256 que MS1/MS2. Middleware `requireRole` por endpoint de escritura; el `admin` solo puede tocar pedidos de su propio `restaurante_id` (viene en el token).
 
-## Consumido por
-- **MS4** → `GET /api/v1/orders/{order_id}` (tracking), `GET /api/v1/orders?customer_id=` / `?delivery_id=` / `?restaurant_id=` (dashboards)
-- **Frontend** → crear pedido, listar pedidos, cambiar estado, claim/deliver (según rol)
+## Quién lo consume
+- **MS4**: casi todos los endpoints, para armar tracking y los 3 dashboards.
+- **Frontend**: crear pedido, listar, cambiar de estado, tomar/entregar (8 llamadas REST).
 
-## Este servicio consume
-- **MS1** → `GET /api/v1/users?rol=customer&ids=...` (para endpoint "clientes del restaurante")
-- **MS2** → `GET /api/v1/restaurants/{restaurant_id}/menu/{dish_id}` (valida plato/precio al crear pedido)
+## Correrlo solo
+```bash
+docker compose -f docker-compose.dev.yml up -d --build postgres ms1 ms2 ms3
+```
+(necesita MS1 y MS2 arriba para validar plato y resolver nombres).

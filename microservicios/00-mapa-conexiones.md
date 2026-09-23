@@ -53,16 +53,20 @@ MS5 (Analítico) ──> AWS Athena (independiente, no llama a MS1-4 en runtime)
 | MS5 | AWS Athena | vistas `v_resumen_ventas_restaurante`, `v_metricas_usuarios` | Analítica (no HTTP a otros MS) |
 | Frontend | MS1-MS5 | mín. 2 endpoints c/u, filtrado por rol | Consumo directo desde SPA |
 
-## Infraestructura real (indicación del profesor)
+## Infraestructura real desplegada
 
-Solo **2 EC2** (no 3):
+**4 EC2** (t2.micro), todas administradas por AWS Systems Manager (sin SSH público excepto para administración puntual):
 
-| EC2 | Contenido |
-|---|---|
-| **EC2 #1 — App Tier** | Los **5 microservicios** dockerizados (MS1-MS5) en un mismo `docker-compose.yml`, todos en la misma instancia. NGINX corre acá también (reverse proxy / path routing, no balanceo entre VMs ya que hay una sola). |
-| **EC2 #2 — DB Tier (privada)** | Contenedores MySQL, PostgreSQL y MongoDB. Sin IP pública — Security Group solo acepta tráfico desde el SG de EC2 #1. |
+| EC2 | Rol | Red |
+|---|---|---|
+| **PP-App-Tier** | NGINX + los 5 microservicios en Docker | pública (Elastic IP), acepta tráfico del ALB |
+| **PP-App-Tier-2** | idéntica a la anterior, balanceada con la primera | pública, acepta tráfico del ALB |
+| **PP-DB-Tier** | contenedores MySQL, PostgreSQL, MongoDB | privada: SG solo acepta 3306/5432/27017 desde el SG de App e Ingesta |
+| **PP-Ingest-VM** | 3 contenedores de ingesta (Python), bajo demanda | privada: SG sin reglas de entrada |
 
-Los MS dentro de EC2 #1 se llaman entre sí por **nombre de contenedor** (misma docker network), y llegan a las BD de EC2 #2 por **IP privada** de esa instancia.
+Entrada pública: `Internet → AWS Amplify (SPA) → API Gateway (HTTPS) → VPC Link → ALB interno (sin IP pública) → NGINX (App Tier 1 o 2, health check /health) → microservicio`.
+
+Los MS dentro de cada App Tier se llaman entre sí por **nombre de contenedor** (misma docker network), y llegan a las BD de PP-DB-Tier por **IP privada**. El ALB reparte el tráfico entre las 2 VMs de App; si una falla su health check, la otra atiende el 100%.
 
 ## Puertos y base URLs internas
 

@@ -12,6 +12,10 @@ hay que reemplazarlas por los IDs reales que devuelve cada comando.
 **Costo:** son 4 instancias `t3.micro` + un Application Load Balancer (el ALB cobra por hora aunque no
 reciba tráfico). Fuera del Free Tier son pocos dólares por día. Sección final: cómo apagarlo todo.
 
+**Automatizado:** [`scripts/aws/`](scripts/aws/) tiene un script en bash por cada paso de esta guía y un
+orquestador (`desplegar-todo.sh`) que los corre todos en orden. Esta guía explica cada paso; los scripts
+lo ejecutan.
+
 ## 0. Prerrequisitos
 
 ```bash

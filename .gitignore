@@ -38,3 +38,4 @@ target/
 # Excepcion: el informe tecnico es un entregable (los PDF del curso siguen excluidos)
 !entregables/*.pdf
 .~lock.*
+scripts/aws/state.env

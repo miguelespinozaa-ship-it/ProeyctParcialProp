@@ -1,4 +1,5 @@
-// Prueba: mensajes de error del login segun el fallo (503, sin conexion, clave incorrecta) y login correcto. Uso: node pruebas/e2e_errores_login.mjs [URL_del_frontend]
+// Prueba: mensajes de error del login (503, sin conexion, clave incorrecta) y login correcto.
+// Uso: node pruebas/e2e_errores_login.mjs [URL_del_frontend]
 import { chromium } from "playwright";
 const U = process.argv[2] || "http://localhost:5173";
 const b = await chromium.launch(); const page = await b.newPage();

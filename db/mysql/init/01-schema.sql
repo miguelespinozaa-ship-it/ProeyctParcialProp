@@ -26,10 +26,9 @@ CREATE TABLE IF NOT EXISTS direcciones (
     INDEX idx_direcciones_usuario (usuario_id)
 );
 
--- Seed manual mínimo (Fase 2), no el masivo de 20k (eso es seed.py en Fase 6).
--- Los 3 usuarios de abajo tienen password "password123" (hash bcrypt real, generado con passlib).
--- customer/delivery normalmente se crean vía POST /auth/register; admin va directo por SQL (register lo rechaza).
--- El restaurante_id del admin es un placeholder hasta correr el seed de MS2 (Fase 3) y reemplazarlo por un _id real de Mongo.
+-- Usuarios demo, password "password123" (hash bcrypt).
+-- admin va directo por SQL porque /auth/register rechaza rol=admin.
+-- restaurante_id es un placeholder: reemplazar por el _id real de Mongo tras correr el seed de MS2.
 INSERT INTO usuarios (nombre, email, password_hash, telefono, rol, restaurante_id)
 VALUES
     ('Cliente Demo', 'customer@demo.com', '$2b$12$A6Is3FCl1EbUaM4hMx2ZG.CxvtjlMc1AoeIWgrtcFbPDiP5/rZvgm', '999111222', 'customer', NULL),

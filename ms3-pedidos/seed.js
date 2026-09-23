@@ -1,8 +1,6 @@
 /**
- * Carga masiva de pedidos (>= 20,000 registros) - MS3.
- * Ejecutar UNA sola vez contra la base real (Fase 6): `node seed.js`
- * Requiere que MS1 (usuarios) y MS2 (restaurantes/platos) ya tengan datos reales —
- * este script los consulta vía HTTP (no asume ids fijos) en vez de hardcodear valores.
+ * Carga masiva de pedidos (>= 20,000 registros) - MS3. Correr una sola vez: `node seed.js`
+ * Requiere MS1 y MS2 con datos cargados; consulta usuarios y platos reales por HTTP.
  */
 require("dotenv").config();
 const { Pool } = require("pg");
@@ -15,8 +13,7 @@ const TOTAL_ORDERS = 20000;
 const BATCH_SIZE = 100;
 const STATUSES = ["PEDIDO", "ENVIADO", "ENTREGADO"];
 
-// Pool dedicado con más conexiones concurrentes que el pool de runtime (src/db.js),
-// solo para acelerar esta carga masiva de una sola vez.
+// Pool con más conexiones que el de runtime (src/db.js), solo para este script.
 const pool = new Pool({
   host: process.env.PG_HOST || "localhost",
   port: process.env.PG_PORT || 5432,

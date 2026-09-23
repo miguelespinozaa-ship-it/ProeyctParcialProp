@@ -2,8 +2,7 @@ const axios = require("axios");
 
 const MS1_BASE_URL = process.env.MS1_BASE_URL || "http://localhost:8081";
 
-// Los ids viajan en la URL (?ids=1,2,3): con miles de ids supera el límite y MS1 responde 400/414.
-// Se piden en lotes chicos, con un poco de paralelismo, y se concatenan los resultados.
+// Ids en lotes de 200, 5 en paralelo, para no superar el límite de la URL en MS1.
 const CHUNK_SIZE = 200;
 const PARALLEL_CHUNKS = 5;
 

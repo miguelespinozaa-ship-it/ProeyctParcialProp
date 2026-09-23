@@ -54,7 +54,7 @@ curl -X POST http://localhost/ms1/api/v1/auth/register -H "Content-Type: applica
 
 ## Estado actual
 
-Todas las fases del plan de desarrollo (0-11) están implementadas, probadas y desplegadas en AWS. Queda la Fase 12 (entregables: diagramas, informe y PPT). Detalle de pruebas por fase: [plan-desarrollo.md](plan-desarrollo.md).
+Los 5 microservicios, el frontend y el pipeline de datos están implementados, probados y desplegados en AWS.
 
 | Pieza | Estado |
 |---|---|

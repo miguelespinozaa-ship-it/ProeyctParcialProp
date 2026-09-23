@@ -105,7 +105,7 @@ async function attachItems(orders) {
 
 // GET /api/v1/orders — filtros ?customer_id= / ?restaurant_id=&status= / ?delivery_id= / ?include_items=true
 // Sin page/page_size devuelve todo (array, como siempre); con ellos, respuesta paginada.
-// Nota: sin auth obligatoria, igual que GET /users en MS1 — lo consume MS4 internamente.
+// Sin auth obligatoria, igual que GET /users en MS1; lo consume MS4 internamente.
 router.get("/orders", async (req, res) => {
   const { customer_id: customerId, restaurant_id: restaurantId, delivery_id: deliveryId, status } = req.query;
   const filters = { customerId, restaurantId, deliveryId, status };

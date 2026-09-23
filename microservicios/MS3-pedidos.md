@@ -44,7 +44,7 @@ orders (1) ──< (N) order_items      ON DELETE CASCADE
 PEDIDO ──(admin dueño del restaurante)──> ENVIADO ──(delivery hace claim, luego deliver)──> ENTREGADO
 ```
 
-- `claim` solo funciona sobre un pedido `ENVIADO` con `delivery_id IS NULL`; es una operación atómica en SQL, así que si dos repartidores lo intentan a la vez solo uno gana (el otro recibe `409`).
+- `claim` solo funciona sobre un pedido `ENVIADO` con `delivery_id IS NULL`, en una operación atómica en SQL: si dos repartidores lo intentan a la vez, solo uno gana (el otro recibe `409`).
 - `deliver` solo lo puede ejecutar el mismo repartidor que hizo el `claim`.
 
 ## Endpoints

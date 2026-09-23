@@ -1,4 +1,4 @@
-// MS2 — Catálogo de Restaurantes (MongoDB). Seed manual mínimo (Fase 3): 2 restaurantes con platos.
+// MS2 — Catálogo de Restaurantes (MongoDB). Seed inicial: 2 restaurantes con platos.
 db = db.getSiblingDB("ms2_catalogo");
 
 db.restaurantes.insertMany([

@@ -1,8 +1,4 @@
-"""Carga masiva de usuarios (>= 20,000 registros) - MS1.
-
-Ejecutar UNA sola vez contra la base real (Fase 6): `python seed.py`
-Requiere que las rutinas de auth (Fase 2) y por lo tanto los modelos ya existan.
-"""
+"""Carga masiva de usuarios (>= 20,000 registros) - MS1. Correr una sola vez: `python seed.py`"""
 
 import random
 

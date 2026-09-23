@@ -1,5 +1,5 @@
-"""Datos de ejemplo para Fase 8 (ATHENA_MOCK=true): misma forma que las vistas reales
-de Fase 9 (`v_resumen_ventas_restaurante`, `v_metricas_usuarios`), pero fijos.
+"""Datos de ejemplo (ATHENA_MOCK=true): misma forma que las vistas reales
+(`v_resumen_ventas_restaurante`, `v_metricas_usuarios`), pero fijos.
 """
 
 
@@ -23,8 +23,7 @@ def mock_top_restaurants() -> list[dict]:
 
 
 def mock_user_metrics() -> list[dict]:
-    # Misma forma que v_metricas_usuarios (data-science/athena/queries_and_views.sql):
-    # MS1 no tiene fecha de nacimiento, así que se agrupa por antigüedad de cuenta, no por edad.
+    # Misma forma que v_metricas_usuarios (data-science/athena/queries_and_views.sql).
     return [
         {"usuario_id": 1, "nombre": "Cliente Demo", "num_pedidos": 12, "gasto_promedio": 45.80, "antiguedad_cuenta": "90+ dias"},
         {"usuario_id": 4, "nombre": "Juan Perez", "num_pedidos": 5, "gasto_promedio": 32.10, "antiguedad_cuenta": "31-90 dias"},

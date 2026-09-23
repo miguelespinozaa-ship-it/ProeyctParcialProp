@@ -8,9 +8,8 @@ AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
 ATHENA_DATABASE = os.getenv("ATHENA_DATABASE", "ubereats_datalake")
 ATHENA_OUTPUT_S3 = os.getenv("ATHENA_OUTPUT_S3", "s3://ubereats-datalake-utec/athena-results/")
 
-# Fase 8: sin el pipeline de Fase 9 (Glue/Athena poblado) no hay nada real contra qué consultar.
 # Con ATHENA_MOCK=true (default) los endpoints devuelven datos de ejemplo con la misma forma
-# que las vistas documentadas. Poner ATHENA_MOCK=false (con credenciales reales) en Fase 9/10.
+# que las vistas reales. Poner ATHENA_MOCK=false con credenciales AWS válidas para consultar Athena.
 ATHENA_MOCK = os.getenv("ATHENA_MOCK", "true").lower() == "true"
 
 _client = None
@@ -48,8 +47,7 @@ def run_query(query: str, poll_interval: float = 1.0, timeout: float = 30.0) -> 
     if status != "SUCCEEDED":
         raise RuntimeError(f"Athena query terminó en estado {status}")
 
-    # get_query_results pagina de a 1000 filas — hay que seguir NextToken hasta agotarlo,
-    # si no se devuelven solo las primeras ~1000 filas de la query (silencioso, sin error).
+    # get_query_results pagina de a 1000 filas: sigue NextToken hasta agotarlo.
     columns: Optional[list[str]] = None
     rows: list[dict] = []
     next_token = None

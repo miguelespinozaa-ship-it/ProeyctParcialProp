@@ -7,8 +7,7 @@ const { envelope, parsePaging } = require("../utils/paging");
 const router = express.Router();
 
 // GET /api/v1/restaurants/:restaurantId/customers
-// Sin page/page_size devuelve todos los clientes (array); con ellos, respuesta paginada
-// (se pagina en SQL y solo se le piden a MS1 los clientes de esa página).
+// Sin page/page_size devuelve todos los clientes (array); con ellos, respuesta paginada.
 router.get("/restaurants/:restaurantId/customers", async (req, res) => {
   const { restaurantId } = req.params;
   const paging = parsePaging(req.query);

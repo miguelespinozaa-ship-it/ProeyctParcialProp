@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Resena {
-    // @Field controla el nombre en MongoDB, @JsonProperty el nombre en el JSON REST (Jackson no lee @Field).
+    // @Field para Mongo, @JsonProperty para el JSON REST.
     @Field("usuario_id")
     @JsonProperty("usuario_id")
     private Integer usuarioId;

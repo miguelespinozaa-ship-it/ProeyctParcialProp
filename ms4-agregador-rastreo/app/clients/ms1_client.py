@@ -7,8 +7,7 @@ MS1_BASE_URL = os.getenv("MS1_BASE_URL", "http://localhost:8081")
 
 
 async def get_user(user_id: int, auth_header: Optional[str] = None):
-    # GET /users/{id} exige JWT propio o admin en MS1 — hay que reenviar el Authorization
-    # del caller original (frontend), MS4 no tiene identidad propia.
+    # Reenvía el Authorization del caller: MS1 exige JWT propio o admin, y MS4 no tiene identidad propia.
     headers = {"Authorization": auth_header} if auth_header else {}
     async with httpx.AsyncClient(timeout=5.0) as client:
         resp = await client.get(f"{MS1_BASE_URL}/api/v1/users/{user_id}", headers=headers)

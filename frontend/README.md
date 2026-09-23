@@ -55,6 +55,6 @@ src/
 
 Flujo completo verificado con Playwright en un Chromium real (no solo build): registro → redirect por rol → browse → carrito → pedido → tracking → login admin → enviar pedido → login delivery → jalar → entregar. Cero errores de consola/JS en las 3 vistas de rol.
 
-## Pendiente (Fase 11 del plan)
+## Despliegue
 
-Deploy en AWS Amplify con CI/CD desde GitHub — no hecho todavía.
+AWS Amplify, conectado a GitHub (rama `main`) con CI/CD: cada push recompila y despliega solo (ver [`amplify.yml`](../amplify.yml) en la raíz).

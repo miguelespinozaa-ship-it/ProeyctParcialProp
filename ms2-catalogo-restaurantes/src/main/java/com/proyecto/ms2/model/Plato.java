@@ -3,9 +3,7 @@ package com.proyecto.ms2.model;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class Plato {
-    // Sin @Field("id") explícito, Spring Data Mongo trata cualquier propiedad "id" como
-    // identificador implícito y la guarda/lee como "_id" — rompe el campo "id" documentado
-    // en objetos embebidos (ver MS2-catalogo-restaurantes.md).
+    // Fuerza el nombre "id" en Mongo; sin esto Spring Data lo guarda como "_id".
     @Field("id")
     private String id;
     private String nombre;

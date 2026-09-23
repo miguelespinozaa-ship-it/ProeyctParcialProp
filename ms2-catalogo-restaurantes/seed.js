@@ -1,7 +1,6 @@
-// Carga masiva de restaurantes (>= 20,000 documentos) - MS2 / MongoDB.
-// Ejecutar UNA sola vez contra la base real:
+// Carga masiva de restaurantes (>= 20,000 documentos) - MS2 / MongoDB. Correr una sola vez:
 //   docker cp ms2-catalogo-restaurantes/seed.js mongo:/tmp/seed.js && docker exec mongo mongosh --quiet --file /tmp/seed.js
-// Conserva los 2 restaurantes del seed inicial (los usan el admin demo y los pedidos) y completa hasta TOTAL.
+// Conserva los 2 restaurantes existentes y completa hasta TOTAL.
 const TOTAL = 20000;
 const BATCH = 1000;
 const database = db.getSiblingDB("ms2_catalogo");

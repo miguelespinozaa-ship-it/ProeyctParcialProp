@@ -61,8 +61,7 @@ def list_users(
     page_size: Optional[int] = Query(None, ge=1, description=f"Tamaño de página (por defecto {DEFAULT_PAGE_SIZE}, máximo {MAX_PAGE_SIZE})"),
     db: Session = Depends(get_db),
 ):
-    # Nota: endpoint también consumido internamente por MS3/MS4 (red docker privada),
-    # por eso no exige JWT propio como el resto — ver 00-mapa-conexiones.md.
+    # También lo consumen MS3/MS4 internamente; sin JWT propio, a diferencia del resto de rutas.
     query = db.query(Usuario)
     if rol is not None:
         query = query.filter(Usuario.rol == rol)

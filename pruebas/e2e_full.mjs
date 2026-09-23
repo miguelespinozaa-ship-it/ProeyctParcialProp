@@ -1,7 +1,6 @@
-// Prueba E2E completa en navegador (Playwright) contra Amplify + API Gateway + AWS.
+// Prueba E2E en navegador: registro, pedido, reseña, despacho, entrega, tracking, analítica y rutas protegidas.
 // Uso: npm i playwright && npx playwright install chromium && node pruebas/e2e_full.mjs
-// Recorre: registro de customer -> pedido -> reseña -> admin despacha -> delivery toma y entrega -> tracking ENTREGADO -> analitica (Athena) -> rutas protegidas.
-// Nota: el segundo claim provoca a proposito un 409 (un pedido solo lo toma un repartidor); es el unico error de consola esperado.
+// El 409 en consola es esperado: un pedido solo lo puede tomar un repartidor.
 import { chromium } from "playwright";
 const U = "https://main.d2wzxjgeu63fi4.amplifyapp.com";
 const API = "https://jt3z0elcud.execute-api.us-east-1.amazonaws.com";

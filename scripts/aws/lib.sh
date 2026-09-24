@@ -65,7 +65,7 @@ print(json.dumps({"commands": [sys.stdin.read()]}))
 # oficial de Canonical.
 ami_ubuntu_22_04() {
   local ami
-  ami=$(aws ec2 describe-images --owners 327094448948 \
+  ami=$(aws ec2 describe-images --owners 327094444948 \
     --filters "Name=name,Values=Cloud9Ubuntu22-*" "Name=state,Values=available" \
     --query 'sort_by(Images,&CreationDate)[-1].ImageId' --output text 2>/dev/null)
   if [ -n "$ami" ] && [ "$ami" != "None" ]; then

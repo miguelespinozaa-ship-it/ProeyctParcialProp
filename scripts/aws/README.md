@@ -12,6 +12,13 @@ para ejecutarlo sin copiar y pegar comando por comando.
 - `python3`, `openssl` y `curl` instalados (para generar contraseñas y armar los parámetros de SSM).
 - Opcional: `npx` (Node.js) para correr la colección de Postman en el paso de verificación.
 
+## Cuenta propia vs. AWS Academy Learner Lab
+
+`01-red.sh` intenta crear el rol `pp-ec2-role` para las EC2. Si la cuenta no tiene permiso para
+`iam:CreateRole` (caso típico de un estudiante en Learner Lab), lo detecta solo y usa en su lugar
+`LabInstanceProfile` (el rol que ya trae el laboratorio) para el resto de los pasos — no hace falta
+tocar nada a mano. En una cuenta propia con permisos de administrador, crea `pp-ec2-role` como siempre.
+
 ## Uso
 
 ```bash

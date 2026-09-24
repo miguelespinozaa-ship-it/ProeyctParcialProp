@@ -31,7 +31,8 @@ EOF
 
 echo "== Glue: base de datos y crawler =="
 aws glue create-database --database-input Name=ubereats_datalake 2>/dev/null || echo "Base ya existe."
-ROLE_GLUE=$(aws iam get-role --role-name pp-ec2-role --query Role.Arn --output text)
+ROL_GLUE_NOMBRE="${PERFIL_EC2/LabInstanceProfile/LabRole}"
+ROLE_GLUE=$(aws iam get-role --role-name "$ROL_GLUE_NOMBRE" --query Role.Arn --output text)
 aws glue create-crawler --name pp-crawler --role "$ROLE_GLUE" --database-name ubereats_datalake \
   --targets S3Targets="[{Path=s3://$BUCKET/raw/}]" 2>/dev/null || echo "Crawler ya existe."
 aws glue start-crawler --name pp-crawler

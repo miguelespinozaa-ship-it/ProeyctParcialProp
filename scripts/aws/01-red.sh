@@ -3,20 +3,33 @@
 source "$(dirname "$0")/lib.sh"
 
 echo "== Rol IAM =="
-if ! aws iam get-role --role-name pp-ec2-role >/dev/null 2>&1; then
-  aws iam create-role --role-name pp-ec2-role --assume-role-policy-document '{
-    "Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' >/dev/null
-  aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-  aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
-  aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonAthenaFullAccess
-  aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
-  aws iam create-instance-profile --instance-profile-name pp-ec2-role >/dev/null
-  aws iam add-role-to-instance-profile --instance-profile-name pp-ec2-role --role-name pp-ec2-role
-  echo "Creado. Esperando propagacion de IAM..."
-  sleep 20
-else
+PERFIL_EC2="pp-ec2-role"
+if aws iam get-role --role-name pp-ec2-role >/dev/null 2>&1; then
   echo "Ya existe, se reusa."
+else
+  set +e
+  SALIDA=$(aws iam create-role --role-name pp-ec2-role --assume-role-policy-document '{
+    "Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' 2>&1)
+  RC=$?
+  set -e
+  if [ $RC -eq 0 ]; then
+    aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+    aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AmazonAthenaFullAccess
+    aws iam attach-role-policy --role-name pp-ec2-role --policy-arn arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+    aws iam create-instance-profile --instance-profile-name pp-ec2-role >/dev/null
+    aws iam add-role-to-instance-profile --instance-profile-name pp-ec2-role --role-name pp-ec2-role
+    echo "Creado. Esperando propagacion de IAM..."
+    sleep 20
+  elif echo "$SALIDA" | grep -q "AccessDenied"; then
+    echo "Cuenta sin permiso para crear roles IAM (AWS Academy Learner Lab). Se usa LabInstanceProfile."
+    PERFIL_EC2="LabInstanceProfile"
+  else
+    echo "$SALIDA" >&2
+    exit 1
+  fi
 fi
+guardar PERFIL_EC2 "$PERFIL_EC2"
 
 echo "== VPC y subredes =="
 VPC=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)

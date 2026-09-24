@@ -9,7 +9,7 @@ Monorepo con 5 microservicios + frontend SPA + pipeline de datos, desplegado en 
 - [estructura-proyecto.md](estructura-proyecto.md) — estructura de repo y flujo de despliegue
 - [microservicios/](microservicios/) — spec de endpoints por microservicio (`00-mapa-conexiones.md` + `MS1`-`MS5`)
 - [DESPLIEGUE-AWS.md](DESPLIEGUE-AWS.md) — cómo desplegar todo en una cuenta de AWS propia (no Learner Lab), de cero
-- [scripts/aws/](scripts/aws/) — automatiza esa misma guía: `./desplegar-todo.sh` corre los 9 pasos en orden
+- [scripts/aws/](scripts/aws/) — automatiza esa misma guía: `./desplegar-todo.sh` corre los 10 pasos en orden
 
 ## Quickstart (desarrollo local)
 

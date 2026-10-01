@@ -97,8 +97,8 @@ amplify.yml                  build de AWS Amplify para el frontend (CI/CD desde 
 
 ## Entregables
 
-- **Diagramas:** [infra/diagramas/](infra/diagramas/) — `proyecto-delivery-cloud.drawio` (5 páginas: arquitectura, E/R de MySQL, E/R de PostgreSQL, JSON de MongoDB, E/R del catálogo de Glue) y sus PNG/SVG. Se regeneran con `python3 infra/diagramas/generar_diagramas.py`.
-- **Informe técnico (PDF) y presentación (PowerPoint):** [entregables/](entregables/), con `generar_informe.py` y `generar_presentacion.js`.
+- **Diagramas:** [infra/diagramas/](infra/diagramas/) — `proyecto-delivery-cloud.drawio` (5 páginas: arquitectura, E/R de MySQL, E/R de PostgreSQL, JSON de MongoDB, E/R del catálogo de Glue) y sus PNG/SVG.
+- **Informe técnico (PDF) y presentación (PowerPoint):** [entregables/](entregables/).
 - **Evidencia de Athena:** `entregables/athena_evidence.json` (4 consultas con JOIN y 2 vistas, con el ID de ejecución de cada una).
 
 ## CI/CD del frontend (AWS Amplify)
